@@ -86,7 +86,7 @@ Tickets are the one deliberate split: the ducks service issues a ticket into the
 | --------------- | ------------- | ---------- | ------------------------------------------------------------ |
 | messages        | flocks        | membership | Membership check before send and before history              |
 | websocket       | flocks        | membership | Topics to subscribe on connect; membership check before push |
-| flocks          | ducks         | duck       | Existence check when adding a member                         |
+| flocks          | ducks         | duck       | Display names when listing members                           |
 
 ## Ponds
 
