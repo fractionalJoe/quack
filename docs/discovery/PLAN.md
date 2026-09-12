@@ -22,7 +22,7 @@ Establish requirements, scope, and scale by completing the design playbook sheet
 
 1. [x] Design Brief sheet: problem statement, business value, personas, workflows, dependencies, success criteria, constraints, assumptions, out of scope, risks. Single-person sections (stakeholders, responsible parties, budget) filled as such. Result: no empty section.
 2. [x] Scoping Questions sheet: answer every question. Result: no empty Answer cell.
-3. [x] Requirements sheet: functional, non-functional, data entities and access patterns, future considerations. Result: every product requirement is an FR with a priority; every entity has at least one access pattern with a frequency; multi-tenancy is a future consideration.
+3. [x] Requirements sheet: functional, non-functional, data entities and access patterns, future considerations. Result: every product requirement is an FR with a priority; every entity has at least one access pattern with a frequency; multiple ponds is a future consideration.
 4. [x] Scale and Estimates sheet: fill every input with a source or stated assumption. Result: Calculated block fully populated.
 
 ## Phase 2: Design
@@ -40,10 +40,10 @@ Establish the technical approach and record every decision before any code exist
 ### Steps
 
 1. [x] Repo skeleton: git init, .gitignore, README stub with the AI-assisted development sentence, docs/README.md, docs/design/, docs/adr/ with the ADR template, GitHub remote, first push. Result: the remote shows the skeleton.
-2. [ ] Architecture: decide compute, HTTP API, real-time transport, web client hosting, Google ID token verification, WebSocket authentication, and stack layout. Result: docs/design/architecture.md with a component diagram and the tenancy note; one ADR per decision.
-3. [ ] Data model: entities and access patterns from the Requirements sheet, table design, keys, tenant key. Result: docs/design/data-model.md; ADR for the data store.
+2. [ ] Architecture: decide compute, HTTP API, real-time transport, web client hosting, Google ID token verification, WebSocket authentication, and stack layout. Result: docs/design/architecture.md with a component diagram and the pond note; one ADR per decision.
+3. [ ] Data model: entities and access patterns from the Requirements sheet, table design, keys, pond key. Result: docs/design/data-model.md; ADR for the data store.
 4. [ ] Request flows: sign-in, create flock, list flocks, add member, delete flock, send message with fan-out, history load, connect and disconnect, each with its authorization check. Result: docs/design/request-flows.md with sequence diagrams.
-5. [ ] Operations and scaling: deploy method, configuration and secrets, logging, cost from the Scale sheet, scaling limits with sourced quotas and what changes, multi-tenancy as the named future enhancement. Result: docs/design/operations.md; ADRs for deploy method and each dependency.
+5. [ ] Operations and scaling: deploy method, configuration and secrets, logging, cost from the Scale sheet, scaling limits with sourced quotas and what changes, multiple ponds as the named future enhancement. Result: docs/design/operations.md; ADRs for deploy method and each dependency.
 6. [ ] Decision Log and ADR sweep: fill the Decision Log sheet; confirm every out of scope item (presence, typing indicators, read state, search, file sharing, notifications, threads, message editing, hosted user pools) and every dependency has an ADR. Result: docs/README.md links everything; pushed.
 
 ## Phase 3: Build
