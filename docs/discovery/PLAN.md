@@ -31,11 +31,11 @@ Establish the technical approach and record every decision before any code exist
 
 ### Exit Criteria
 
-- [ ] docs/design holds architecture, data model, request flows, and operational design (including where the design stops scaling and what changes), each complete for the MVP.
-- [ ] Every scope cut and every dependency has an ADR in docs/adr in the agreed format.
-- [ ] Decision Log sheet lists every expensive-to-reverse decision with a link to its ADR.
-- [ ] No application code exists. Every numeric claim in docs carries a source link.
-- [ ] Design docs are pushed to the GitHub remote.
+- [x] docs/design holds architecture, data model, request flows, and operational design (including where the design stops scaling and what changes), each complete for the MVP.
+- [x] Every scope cut and every dependency has an ADR in docs/adr in the agreed format.
+- [x] Decision Log sheet lists every expensive-to-reverse decision with a link to its ADR.
+- [x] No application code exists. Every numeric claim in docs carries a source link.
+- [x] Design docs are pushed to the GitHub remote.
 
 ### Steps
 
@@ -44,7 +44,7 @@ Establish the technical approach and record every decision before any code exist
 3. [x] Data model: entities and access patterns from the Requirements sheet, table design, keys, pond key. Result: docs/design/data-model.md; ADR for the data store.
 4. [x] Request flows: sign-in, create flock, list flocks, add member, delete flock, send message with fan-out, history load, connect and disconnect, each with its authorization check. Result: docs/design/flows/, one file per flow with a sequence diagram.
 5. [x] Operations and scaling: deploy method, configuration and secrets, logging, cost from the Scale sheet, scaling limits with sourced quotas and what changes, multiple ponds as the named future enhancement. Result: docs/design/operational-design.md; ADRs for each dependency.
-6. [ ] Decision Log and ADR sweep: fill the Decision Log sheet; confirm every out of scope item (presence, typing indicators, read state, search, file sharing, notifications, threads, message editing, hosted user pools) and every dependency has an ADR. Result: docs/README.md links everything; pushed.
+6. [x] Decision Log and ADR sweep: fill the Decision Log sheet; confirm every out of scope item (presence, typing indicators, read state, search, file sharing, notifications, threads, message editing, hosted user pools) and every dependency has an ADR. Result: docs/README.md links everything; pushed.
 
 ## Phase 3: Build
 
