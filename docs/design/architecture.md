@@ -99,7 +99,7 @@ One repository. Each row is a CDK stack in its own project; independent stacks d
 
 | Stack                              | Contents                                                                                       | Depends on                  |
 | ---------------------------------- | ---------------------------------------------------------------------------------------------- | --------------------------- |
-| network                            | VPC, subnets, NAT or endpoints for image pulls                                                 | none                        |
+| network                            | VPC, subnets, NAT gateway for image pulls and Google key fetches                                | none                        |
 | data                               | Aurora cluster, subnet group, security group, schema migration                                 | network                     |
 | fanout | ElastiCache Valkey node, subnet group, security group | network |
 | cluster | ECS cluster, load balancer, HTTPS listener, certificate | network |

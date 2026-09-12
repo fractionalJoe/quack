@@ -126,4 +126,4 @@ The cascade on flock delete runs under the owner of the referencing tables, so f
 
 ## Schema changes
 
-The schema and policies live in one SQL file in the data stack's project and are applied by a migration step at deploy. The mechanism is in operations.md.
+The schema and policies live in one SQL file in the data stack's project and are applied by a migration step at deploy. The mechanism is in operational-design.md.

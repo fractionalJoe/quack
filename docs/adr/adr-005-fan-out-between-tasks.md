@@ -10,7 +10,7 @@ Related ADRs: adr-002-compute.md, adr-004-http-entry-point.md
 # ADR-005: Fan-out between tasks
 
 ## Question Under Consideration
-A member's WebSocket lands on one ECS task, chosen by the load balancer. A message sent to a flock arrives on the sender's task, which can push only to the recipients it holds. How does the message reach recipients connected to other tasks? The Scale and Estimates sheet projects 8.4 million connections open at peak. At 50,000 sockets per task (ADR-002) that is about 170 tasks, so a flock's members are spread across many tasks. Delivery must arrive in under one second (SC-07).
+A member's WebSocket lands on one ECS task, chosen by the load balancer. A message sent to a flock arrives on the sender's task, which can push only to the recipients it holds. How does the message reach recipients connected to other tasks? The Scale and Estimates sheet projects 8.4 million connections open at peak. At 50,000 sockets per task, an assumption on the Scale and Estimates sheet, that is about 170 tasks, so a flock's members are spread across many tasks. Delivery must arrive in under one second (SC-07).
 
 ## Decision
 Tasks fan out through Valkey pub/sub on ElastiCache. Pub/sub has named topics; a task subscribes to the topic of each flock that one of its connections belongs to. A send publishes the message once to the flock's topic; every subscribed task pushes it to the recipients it holds.

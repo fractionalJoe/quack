@@ -31,7 +31,7 @@ Establish the technical approach and record every decision before any code exist
 
 ### Exit Criteria
 
-- [ ] docs/design holds architecture, data model, request flows, and operations (including where the design stops scaling and what changes), each complete for the MVP.
+- [ ] docs/design holds architecture, data model, request flows, and operational design (including where the design stops scaling and what changes), each complete for the MVP.
 - [ ] Every scope cut and every dependency has an ADR in docs/adr in the agreed format.
 - [ ] Decision Log sheet lists every expensive-to-reverse decision with a link to its ADR.
 - [ ] No application code exists. Every numeric claim in docs carries a source link.
@@ -43,7 +43,7 @@ Establish the technical approach and record every decision before any code exist
 2. [x] Architecture: decide compute, HTTP API, real-time transport, web client hosting, Google ID token verification, WebSocket authentication, and stack layout. Result: docs/design/architecture.md with a component diagram and the pond note; one ADR per decision.
 3. [x] Data model: entities and access patterns from the Requirements sheet, table design, keys, pond key. Result: docs/design/data-model.md; ADR for the data store.
 4. [x] Request flows: sign-in, create flock, list flocks, add member, delete flock, send message with fan-out, history load, connect and disconnect, each with its authorization check. Result: docs/design/flows/, one file per flow with a sequence diagram.
-5. [ ] Operations and scaling: deploy method, configuration and secrets, logging, cost from the Scale sheet, scaling limits with sourced quotas and what changes, multiple ponds as the named future enhancement. Result: docs/design/operations.md; ADRs for deploy method and each dependency.
+5. [ ] Operations and scaling: deploy method, configuration and secrets, logging, cost from the Scale sheet, scaling limits with sourced quotas and what changes, multiple ponds as the named future enhancement. Result: docs/design/operational-design.md; ADRs for deploy method and each dependency.
 6. [ ] Decision Log and ADR sweep: fill the Decision Log sheet; confirm every out of scope item (presence, typing indicators, read state, search, file sharing, notifications, threads, message editing, hosted user pools) and every dependency has an ADR. Result: docs/README.md links everything; pushed.
 
 ## Phase 3: Build
@@ -62,7 +62,7 @@ Implement the design, deploying to the dev account as each step completes. Satur
 2. [ ] Scaffold: workspace layout per architecture.md, TypeScript config, CDK app with empty stack(s), deployed. Result: stack(s) in CloudFormation; cdk diff is clean.
 3. [ ] Data layer: table(s) per data-model.md in CDK; data access module covering every access pattern. Result: a script exercises each access pattern against the deployed table.
 4. [ ] Sign-in: Google ID token verification, authorizer, user record upsert. Result: a request with a valid ID token succeeds; invalid and expired tokens get 401.
-5. [ ] Flocks: create, list, add member, delete. Result: curl walkthrough creates, lists, adds a member, and deletes; only the creator can delete; rules from request-flows.md hold.
+5. [ ] Flocks: create, list, add member, delete. Result: curl walkthrough creates, lists, adds a member, and deletes; only the creator can delete; rules from flows/README.md hold.
 6. [ ] Messages: send and history. Result: a sent message persists; history returns recent messages in order; non-member send and read are rejected.
 7. [ ] Real-time: WebSocket connect with authentication, disconnect cleanup, fan-out on send. Result: two wscat sessions; a message from one arrives at the other; a non-member session receives nothing.
 8. [ ] Load test: k6 script against the HTTP API and the live path with a captured ID token. Result: latency, freshness, and error-rate figures recorded against SC-01 to SC-07; autoscaling observed.
