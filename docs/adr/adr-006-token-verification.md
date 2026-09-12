@@ -1,5 +1,5 @@
 ---
-Status: Proposed
+Status: Accepted
 Created: 2026-09-12
 Decided: 2026-09-12
 Contributors: Joe Martin, Claude
