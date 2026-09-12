@@ -10,7 +10,7 @@ Related ADRs: adr-001-hostnames-and-dns.md, adr-002-compute.md
 # ADR-004: HTTP and WebSocket entry point
 
 ## Question Under Consideration
-ADR-002 puts the service on ECS. What sits between the internet and the tasks for the HTTP API and for WebSocket connections? The Scale and Estimates sheet projects 21.6 billion HTTP requests per month at 12 KB average response, 4.5 million WebSocket connections open on average, and 1,700 new connections per second at steady state (AP-14). Google ID tokens must be verified on every request (NFR-06).
+ADR-002 puts the service on ECS. What sits between the internet and the tasks for the HTTP API and for WebSocket connections? The Scale and Estimates sheet projects 21.6 billion HTTP requests per month at 12 KB average response, 4.5 million WebSocket connections open on average, and 2,500 new connections per second at peak (AP-14). Google ID tokens must be verified on every request (NFR-06).
 
 ## Decision
 One internet-facing Application Load Balancer on api.quack.ryt.dev serves both the HTTP API and WebSocket connections, forwarding to the ECS service. No API Gateway.
