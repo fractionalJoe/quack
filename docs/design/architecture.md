@@ -44,7 +44,7 @@ flowchart LR
 | Cloudflare DNS | Holds the zone for ryt.dev. DNS-only CNAME records point quack.ryt.dev at CloudFront and api.quack.ryt.dev at the load balancer, plus the CNAMEs that validate the certificates. Records are entered by hand. | none, outside AWS |
 | Web client | Static files on S3, served by CloudFront at quack.ryt.dev | web |
 | Application Load Balancer | HTTPS listener on api.quack.ryt.dev; path rules to services; WebSocket upgrades pass through                                            | cluster             |
-| `ducks` service           | ECS Fargate service; sign-in, me, tickets, user lookup                                                                                     | ducks               |
+| `ducks` service           | ECS Fargate service; sign-in, me, tickets, duck list                                                                                     | ducks               |
 | `flocks` service          | ECS Fargate service; flocks and memberships                                                                                             | flocks              |
 | `messages` service        | ECS Fargate service; send and history                                                                                                   | messages            |
 | `websocket` service       | ECS Fargate service; socket sessions and live delivery                                                                            | websocket           |
@@ -86,7 +86,8 @@ Tickets are the one deliberate split: the ducks service issues a ticket into the
 | --------------- | ------------- | ---------- | ------------------------------------------------------------ |
 | messages        | flocks        | membership | Membership check before send and before history              |
 | websocket       | flocks        | membership | Topics to subscribe on connect; membership check before push |
-| flocks          | ducks         | duck       | Display names when listing members                           |
+| flocks          | ducks         | duck       | Caller lookup on every request; display names when listing members |
+| messages        | ducks         | duck       | Caller lookup on every request                               |
 
 ## Ponds
 

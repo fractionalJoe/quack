@@ -63,7 +63,7 @@ Primary keys are the entity's own ID; a membership's key is (flock_id, duck_id) 
 
 **ponds**, owned by the migration. One row in the MVP. Services do not read it; the pond ID they use is configuration.
 
-**ducks** (DE-01), owned by the ducks domain. Unique (pond_id, google_subject), the sub claim of the ID token, so one Google account can be a duck in more than one pond later. Unique (pond_id, display_name); it is how a member names the duck to add (FR-04). Display names come from Google and are not unique there, so a sign-in whose name collides with an existing duck fails. That is intentional for the demo; a production application would have each user choose a username, as Slack does. Email is read from the token to satisfy verification and is not stored (NFR-07). google_subject is used in one place: on each request the service looks up the caller's duck_id by it. Every other table refers to a duck by duck_id and never stores google_subject, so a change of identity provider changes this one column and nothing else.
+**ducks** (DE-01), owned by the ducks domain. Unique (pond_id, google_subject), the sub claim of the ID token, so one Google account can be a duck in more than one pond later. Unique (pond_id, display_name); it is how a member names the duck to add (FR-04). Display names come from Google and are not unique there, so a sign-in whose name collides with an existing duck fails. That is intentional for the demo; a production application would have each user choose a username, as Slack does. Email is read from the token to satisfy verification and is not stored (NFR-07). google_subject is used in one place: on each request the service looks up the caller's duck_id by it (flows/README.md). Every other table refers to a duck by duck_id and never stores google_subject, so a change of identity provider changes this one column and nothing else.
 
 **flocks** (DE-02), owned by the flocks domain. Unique (pond_id, name); creating a flock with a name already in the pond is refused. owner_id is the creator and is not transferable.
 
@@ -90,6 +90,7 @@ Row-level security adds the pond filter to every query, so pond_id appears in no
 | AP-11 | Put message | Insert a message | messages |
 | AP-12 | Read latest 50 messages in a flock, newest first | Select messages WHERE flock_id = ? ORDER BY message_id DESC LIMIT 50; uses the (flock_id, message_id) index | messages |
 | AP-13 | Delete all messages in a flock | Run by the cascade in AP-05 | database |
+| AP-16 | List ducks in the pond | Select ducks | ducks |
 
 AP-14 and AP-15 are not data store access patterns; sockets live in websocket task memory and delivery goes through the fan-out topic (ADR-005).
 
@@ -118,7 +119,7 @@ One database role per service, each a member of rds_iam so it authenticates with
 | ------------- | ---------------------- | ---------------------- | -------------- | -------------- |
 | ducks_svc     | SELECT, INSERT, UPDATE |                        |                |                |
 | flocks_svc    | SELECT                 | SELECT, INSERT, DELETE | SELECT, INSERT |                |
-| messages_svc  |                        |                        | SELECT         | SELECT, INSERT |
+| messages_svc  | SELECT                 |                        | SELECT         | SELECT, INSERT |
 | websocket_svc |                        |                        | SELECT         |                |
 
 The cascade on flock delete runs under the owner of the referencing tables, so flocks_svc needs no grant on messages to delete a flock.
