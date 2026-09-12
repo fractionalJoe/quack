@@ -27,7 +27,7 @@ Establish requirements, scope, and scale by completing the design playbook sheet
 
 ## Phase 2: Design
 
-Establish the technical approach and record every decision before any code exists. Saturday late morning, 3 hours. At each decision point the options are presented, Joe decides, and an ADR records it.
+Establish the technical approach and record every decision before any code exists. Saturday late morning, 3 hours. Actual: 7 hours 35 minutes. At each decision point the options are presented, Joe decides, and an ADR records it.
 
 ### Exit Criteria
 
