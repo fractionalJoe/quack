@@ -39,7 +39,7 @@ Establish the technical approach and record every decision before any code exist
 
 ### Steps
 
-1. [ ] Repo skeleton: git init, .gitignore, README stub with the AI-assisted development sentence, docs/README.md, docs/design/, docs/adr/ with the ADR template, GitHub remote, first push. Result: the remote shows the skeleton.
+1. [x] Repo skeleton: git init, .gitignore, README stub with the AI-assisted development sentence, docs/README.md, docs/design/, docs/adr/ with the ADR template, GitHub remote, first push. Result: the remote shows the skeleton.
 2. [ ] Architecture: decide compute, HTTP API, real-time transport, web client hosting, Google ID token verification, WebSocket authentication, and stack layout. Result: docs/design/architecture.md with a component diagram and the tenancy note; one ADR per decision.
 3. [ ] Data model: entities and access patterns from the Requirements sheet, table design, keys, tenant key. Result: docs/design/data-model.md; ADR for the data store.
 4. [ ] Request flows: sign-in, create flock, list flocks, add member, delete flock, send message with fan-out, history load, connect and disconnect, each with its authorization check. Result: docs/design/request-flows.md with sequence diagrams.
