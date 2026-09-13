@@ -56,25 +56,25 @@ Prove the MVP deploys to the dev account from the repo alone and publish the rep
 
 **2026-09-13** Bottom-up estimate of the slices above. One sitting per step; the first deploy of each new kind of thing (the Actions workflow, the migrate job, IAM database authentication from a task, WebSockets through the load balancer) is where a step goes over.
 
-| Step                     | Work                                                                                                                                                           | Hours | Actual |
-| ------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----- | ------ |
-| Phase 1 Discovery        | Design playbook sheets: brief, scoping, requirements, entities and access patterns, scale, decision log                                                        | 2     | 5.25   |
-| Phase 2 Design           | Architecture, data model, flows, operational design, ADRs 001 to 012                                                                                           | 3     | 7.5    |
-| 3.1 Bootstrap (original) | Account bootstrap template, OIDC provider and deploy role, CDK bootstrap, Google OAuth client                                                                  | 1     |        |
-| 3.1 Infra                | Root TypeScript config, config reader, infra package and stack, Actions workflow with OIDC, first deploy through the workflow                                  | 2     | 2.25   |
-| 3.2 Data                 | Data package and stack with Data API and SSM parameters, Drizzle schema, security SQL, migrate job, shared package with data access, RLS settings and IAM auth | 4     |        |
-| 3.3 Cluster              | Cluster stack with ALB and certificate, fanout stack, Cloudflare records                                                                                       | 2     |        |
-| 3.4 Ducks                | Token module, fastify hook, log line, service construct, ducks service and stack, IAM database authentication from a task                                      | 3     |        |
-| 3.5 Flocks               | Service, stack, curl walkthrough                                                                                                                               | 1.5   |        |
-| 3.6 Messages             | Service, stack, publish                                                                                                                                        | 1.5   |        |
-| 3.7 Real-time            | Ticket route, websocket service, subscriptions, close at expiry, /ws rule, stack, wscat test                                                                   | 3     |        |
-| 3.8 Load test            | k6 script for HTTP and sockets, run, record against SC-01 to SC-07                                                                                             | 2     |        |
-| 3.9 Web client           | React app, Google sign-in, every flow, web stack, certificate, Cloudflare records                                                                              | 4     |        |
-| 3.10 Hardening           | Validation, error responses, negative-path checklist                                                                                                           | 1     |        |
-| 3.11 Docs alignment      | README walkthrough, doc updates, deviation ADRs                                                                                                                | 1.5   |        |
-| 4.1 Clean deploy         | Destroy, redeploy from the README, fix what it misses                                                                                                          | 1.5   |        |
-| 4.2 Smoke checklist      | Every item plus the load test rerun                                                                                                                            | 1     |        |
-| 4.3 Publish              | Greps, checks, visibility                                                                                                                                      | 0.5   |        |
-| Total                    |                                                                                                                                                                | 34.5  |        |
+| Step                     | Work                                                                                                                                                           | Original | Revised | Actual |
+| ------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------- | ------- | ------ |
+| Phase 1 Discovery        | Design playbook sheets: brief, scoping, requirements, entities and access patterns, scale, decision log                                                        | 2        |         | 5.25   |
+| Phase 2 Design           | Architecture, data model, flows, operational design, ADRs 001 to 012                                                                                           | 3        |         | 7.5    |
+| 3.1 Bootstrap (original) | Account bootstrap template, OIDC provider and deploy role, CDK bootstrap, Google OAuth client                                                                  | 1        |         | 1.5    |
+| 3.1 Infra                | Root TypeScript config, config reader, infra package and stack, Actions workflow with OIDC, first deploy through the workflow                                  | 2        |         | 2.25   |
+| 3.2 Data                 | Data package and stack with Data API and SSM parameters, Drizzle schema, security SQL, migrate job, shared package with data access, RLS settings and IAM auth | 4        |         | 4.75   |
+| 3.3 Cluster              | Cluster stack with ALB and certificate, fanout stack, Cloudflare records                                                                                       | 2        | 3       |        |
+| 3.4 Ducks                | Token module, fastify hook, log line, service construct, ducks service and stack, IAM database authentication from a task                                      | 3        | 4.5     |        |
+| 3.5 Flocks               | Service, stack, curl walkthrough                                                                                                                               | 1.5      | 2.25    |        |
+| 3.6 Messages             | Service, stack, publish                                                                                                                                        | 1.5      | 2.25    |        |
+| 3.7 Real-time            | Ticket route, websocket service, subscriptions, close at expiry, /ws rule, stack, wscat test                                                                   | 3        | 4.5     |        |
+| 3.8 Load test            | k6 script for HTTP and sockets, run, record against SC-01 to SC-07                                                                                             | 2        | 3       |        |
+| 3.9 Web client           | React app, Google sign-in, every flow, web stack, certificate, Cloudflare records                                                                              | 4        | 6       |        |
+| 3.10 Hardening           | Validation, error responses, negative-path checklist                                                                                                           | 1        | 1.5     |        |
+| 3.11 Docs alignment      | README walkthrough, doc updates, deviation ADRs                                                                                                                | 1.5      | 2.25    |        |
+| 4.1 Clean deploy         | Destroy, redeploy from the README, fix what it misses                                                                                                          | 1.5      | 2.25    |        |
+| 4.2 Smoke checklist      | Every item plus the load test rerun                                                                                                                            | 1        | 1.5     |        |
+| 4.3 Publish              | Greps, checks, visibility                                                                                                                                      | 0.5      | 0.75    |        |
+| Total                    |                                                                                                                                                                | 34.5     | 55      | 21.25  |
 
-Each step carries about plus or minus 30 percent.
+Revised figures are the original times 1.5, the ratio observed on the completed Build steps; the Total column adds actuals for completed rows to revised figures for the rest.
