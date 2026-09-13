@@ -1,0 +1,77 @@
+name: Deploy
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+    inputs:
+      deploy_environment:
+        description: Target deploy environment
+        type: choice
+        default: dev
+        options:
+          - dev
+      infra:
+        description: Deploy InfraStack
+        type: boolean
+        default: false
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  changes:
+    runs-on: ubuntu-latest
+    outputs:
+      infra: ${{ steps.filter.outputs.infra }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
+      - name: Detect changed paths
+        uses: dorny/paths-filter@v4
+        id: filter
+        with:
+          filters: |
+            infra:
+              - packages/infra/**
+              - packages/shared/**
+              - .github/**
+
+  build:
+    runs-on: ubuntu-latest
+    environment: ${{ github.event.inputs.deploy_environment || 'dev' }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
+      - name: Setup
+        uses: ./.github/actions/setup
+
+      - name: Unit tests
+        run: pnpm typecheck && pnpm test:unit
+
+  infra:
+    needs: [changes, build]
+    if: needs.changes.outputs.infra == 'true' || (github.event_name == 'workflow_dispatch' && inputs.infra)
+    runs-on: ubuntu-latest
+    # environment sets the OIDC subject to repo:<org>/<repo>:environment:<name>,
+    # the only subject BootstrapIam.yaml trusts.
+    environment: ${{ github.event.inputs.deploy_environment || 'dev' }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
+      - name: Read region
+        id: config
+        run: echo "region=$(jq -r .primary.region config.json)" >> "$GITHUB_OUTPUT"
+
+      - name: Setup
+        uses: ./.github/actions/setup
+        with:
+          role-to-assume: ${{ vars.AWS_DEPLOY_ROLE_ARN }}
+          aws-region: ${{ steps.config.outputs.region }}
+
+      - name: Deploy QuackInfraStack
+        run: pnpm infra cdk deploy QuackInfraStack --require-approval never

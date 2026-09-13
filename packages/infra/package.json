@@ -5,8 +5,9 @@
   "type": "module",
   "scripts": {
     "cdk": "cdk",
-    "build": "tsc",
-    "diff": "cdk diff QuackInfraStack --profile ryt.quack.admin"
+    "typecheck": "tsc --noEmit",
+    "diff": "cdk diff QuackInfraStack --profile ryt.quack.admin",
+    "deploy": "cdk deploy QuackInfraStack --profile ryt.quack.admin"
   },
   "dependencies": {
     "@quack/shared": "workspace:*",

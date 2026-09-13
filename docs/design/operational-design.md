@@ -36,17 +36,7 @@ flowchart LR
     migrate & cluster & fanout --> s4
 ```
 
-The deploy role trusts main only and may assume the CDK bootstrap roles ([Bootstrapping](https://docs.aws.amazon.com/cdk/v2/guide/bootstrapping.html)). The migrate role trusts main and holds only the Data API, master secret, and SSM parameter permissions the migration needs. Both come from `packages/infra/BootstrapIam.yaml`, applied once per account, outside the CDK app:
-
-```
-aws cloudformation deploy \
-  --profile <aws_profile_name> \
-  --region us-east-1 \
-  --stack-name BootstrapIam \
-  --template-file packages/infra/BootstrapIam.yaml \
-  --capabilities CAPABILITY_NAMED_IAM \
-  --parameter-overrides GitHubRepo=quack
-```
+The deploy role may assume the CDK bootstrap roles ([Bootstrapping](https://docs.aws.amazon.com/cdk/v2/guide/bootstrapping.html)). The migrate role holds only the Data API, master secret, and SSM parameter permissions the migration needs. Both trust one GitHub Environment and nothing else; which branches may deploy to that environment is a rule on the environment in GitHub. Both come from `packages/infra/BootstrapIam.yaml`, applied once per account outside the CDK app (README, Setup).
 
 `cdk deploy` from a developer machine is the path for initial setup and troubleshooting. Both paths run the same apps from the same configuration.
 
