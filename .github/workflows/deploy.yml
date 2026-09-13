@@ -15,6 +15,10 @@ on:
         description: Deploy InfraStack
         type: boolean
         default: false
+      data:
+        description: Deploy DataStack
+        type: boolean
+        default: false
 
 permissions:
   id-token: write
@@ -25,6 +29,7 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       infra: ${{ steps.filter.outputs.infra }}
+      data: ${{ steps.filter.outputs.data }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v6
@@ -37,6 +42,11 @@ jobs:
             infra:
               - packages/infra/**
               - packages/libs/shared/**
+              - .github/**
+            data:
+              - packages/data/**
+              - packages/libs/shared/**
+              - packages/libs/cdk/**
               - .github/**
 
   build:
@@ -75,3 +85,36 @@ jobs:
 
       - name: Deploy QuackInfraStack
         run: pnpm infra cdk deploy QuackInfraStack --require-approval never
+
+  data:
+    needs: [changes, build, infra]
+    # !cancelled() replaces the implied success(), which would skip this job
+    # whenever infra is skipped. Build must pass and infra must pass or be
+    # skipped; then run on a data change or on dispatch with the data input.
+    if: >-
+      !cancelled() && needs.build.result == 'success' && 
+      (needs.infra.result == 'success' || needs.infra.result == 'skipped') &&
+      (
+        needs.changes.outputs.data == 'true' || 
+        (github.event_name == 'workflow_dispatch' && inputs.data)
+      )
+    runs-on: ubuntu-latest
+    # environment sets the OIDC subject to repo:<org>/<repo>:environment:<name>,
+    # the only subject BootstrapIam.yaml trusts.
+    environment: ${{ github.event.inputs.deploy_environment || 'dev' }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
+      - name: Read region
+        id: config
+        run: echo "region=$(jq -r .primary.region config.json)" >> "$GITHUB_OUTPUT"
+
+      - name: Setup
+        uses: ./.github/actions/setup
+        with:
+          role-to-assume: ${{ vars.AWS_DEPLOY_ROLE_ARN }}
+          aws-region: ${{ steps.config.outputs.region }}
+
+      - name: Deploy QuackDataStack
+        run: pnpm data cdk deploy QuackDataStack --require-approval never
