@@ -5,6 +5,7 @@ import { Port, Vpc } from "aws-cdk-lib/aws-ec2";
 import { StringParameter } from "aws-cdk-lib/aws-ssm";
 import { QuackStack } from "@quack/cdk";
 import { BastionHost } from "./lib/bastion-host.ts";
+import { ValkeyNode } from "./lib/valkey-node.ts";
 
 export interface DataStackProps extends StackProps {
   autoPauseSeconds: number;
@@ -37,6 +38,8 @@ export class DataStack extends QuackStack {
       "Allow ingress from bastion host",
     );
 
+    const valkey = new ValkeyNode(this, { vpc });
+
     this.addStackOutput("ClusterArn", cluster.clusterArn, "/quack/data/cluster-arn");
     this.addStackOutput("ClusterSecretArn", cluster.secretArn, "/quack/data/secret-arn");
     this.addStackOutput("ClusterEndpoint", cluster.endpoint, "/quack/data/endpoint");
@@ -46,5 +49,11 @@ export class DataStack extends QuackStack {
       "/quack/data/security-group-id",
     );
     this.addStackOutput("BastionSecurityGroupId", bastion.securityGroup.securityGroupId);
+    this.addStackOutput("ValkeyEndpoint", valkey.endpoint, "/quack/data/valkey-endpoint");
+    this.addStackOutput(
+      "ValkeySecurityGroupId",
+      valkey.securityGroup.securityGroupId,
+      "/quack/data/valkey-security-group-id",
+    );
   }
 }
