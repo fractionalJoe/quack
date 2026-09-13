@@ -1,0 +1,17 @@
+{
+  "name": "@quack/db",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "build": "tsc",
+    "typecheck": "tsc --noEmit",
+    "test:unit": "tsx --test src/**/*.test.ts"
+  },
+  "dependencies": {
+    "drizzle-orm": "^0.45.2"
+  }
+}
