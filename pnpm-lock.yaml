@@ -190,9 +190,6 @@ importers:
 
   packages/data:
     dependencies:
-      '@quack/cdk':
-        specifier: workspace:*
-        version: link:../cdk
       '@quack/shared':
         specifier: workspace:*
         version: link:../shared
