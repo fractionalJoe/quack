@@ -22,7 +22,7 @@ Implement the design as deployed slices. Sunday, 12 hours.
 
 ### Steps
 
-1. [ ] Infra: root TypeScript config, config.json read by CDK, infra package and stack (VPC, public and private subnets, NAT gateway), GitHub Environment dev holding the deploy role ARN, GitHub Actions workflow assuming the deploy role through OIDC, first deploy through the workflow. Each later slice adds its own package. Result: the infra stack is in CloudFormation, deployed by the workflow; cdk diff is clean.
+1. [x] Infra: root TypeScript config, config.json read by CDK, infra package and stack (VPC, public and private subnets, NAT gateway), GitHub Environment dev holding the deploy role ARN, GitHub Actions workflow assuming the deploy role through OIDC, first deploy through the workflow. Each later slice adds its own package. Result: the infra stack is in CloudFormation, deployed by the workflow; cdk diff is clean.
 2. [ ] Data: data package and stack (Aurora Serverless v2 with the Data API, subnet group, security group, SSM parameters under /quack/data/), Drizzle schema, security SQL migration (roles, is_member and is_owner, policies, grants), migrate job assuming the migrate role, shared package with data access (pool, IAM token, transaction settings), access pattern script. Result: the migrate job passes in the workflow; the script exercises each access pattern against the deployed cluster.
 3. [ ] Cluster: cluster stack (ECS cluster, load balancer, HTTPS listener, certificate), fanout stack (Valkey node, subnet group, security group), Cloudflare validation and api CNAME records. Result: https://api.quack.ryt.dev answers with the listener's default response over a valid certificate; both stacks are in CloudFormation.
 4. [ ] Ducks: shared token module, fastify verify-and-resolve hook, request log line, shared service construct (task definition, service, target group, listener rule, log group, database role and grants), ducks service (PUT and GET /ducks/me, GET /ducks) and stack. Result: a request with a valid ID token upserts and returns the duck; invalid and expired tokens get 401.
@@ -56,22 +56,25 @@ Prove the MVP deploys to the dev account from the repo alone and publish the rep
 
 **2026-09-13** Bottom-up estimate of the slices above. One sitting per step; the first deploy of each new kind of thing (the Actions workflow, the migrate job, IAM database authentication from a task, WebSockets through the load balancer) is where a step goes over.
 
-| Step                | Work                                                                                                                                                | Hours |
-| ------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------- | ----- |
-| 3.1 Infra           | Root TypeScript config, config reader, infra package and stack, Actions workflow with OIDC, first deploy through the workflow                     | 2     |
-| 3.2 Data            | Data package and stack with Data API and SSM parameters, Drizzle schema, security SQL, migrate job, shared package with data access, RLS settings and IAM auth, access pattern script | 4 |
-| 3.3 Cluster         | Cluster stack with ALB and certificate, fanout stack, Cloudflare records                                                                            | 2     |
-| 3.4 Ducks           | Token module, fastify hook, log line, service construct, ducks service and stack, IAM database authentication from a task                          | 3     |
-| 3.5 Flocks          | Service, stack, curl walkthrough                                                                                                                    | 1.5   |
-| 3.6 Messages        | Service, stack, publish                                                                                                                             | 1.5   |
-| 3.7 Real-time       | Ticket route, websocket service, subscriptions, close at expiry, /ws rule, stack, wscat test                                                        | 3     |
-| 3.8 Load test       | k6 script for HTTP and sockets, run, record against SC-01 to SC-07                                                                                  | 2     |
-| 3.9 Web client      | React app, Google sign-in, every flow, web stack, certificate, Cloudflare records                                                                   | 4     |
-| 3.10 Hardening      | Validation, error responses, negative-path checklist                                                                                                | 1     |
-| 3.11 Docs alignment | README walkthrough, doc updates, deviation ADRs                                                                                                     | 1.5   |
-| 4.1 Clean deploy    | Destroy, redeploy from the README, fix what it misses                                                                                               | 1.5   |
-| 4.2 Smoke checklist | Every item plus the load test rerun                                                                                                                 | 1     |
-| 4.3 Publish         | Greps, checks, visibility                                                                                                                           | 0.5   |
-| Total               |                                                                                                                                                     | 28.5  |
+| Step                     | Work                                                                                                                                                                                  | Hours | Actual |
+| ------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----- | ------ |
+| Phase 1 Discovery        | Design playbook sheets: brief, scoping, requirements, entities and access patterns, scale, decision log                                                                               | 2     | 5.25   |
+| Phase 2 Design           | Architecture, data model, flows, operational design, ADRs 001 to 012                                                                                                                  | 3     | 7.5    |
+| 3.1 Bootstrap (original) | Account bootstrap template, OIDC provider and deploy role, CDK bootstrap, Google OAuth client                                                                                         | 1     |        |
+| 3.1 Infra                | Root TypeScript config, config reader, infra package and stack, Actions workflow with OIDC, first deploy through the workflow                                                         | 2     | 2.25   |
+| 3.2 Data                 | Data package and stack with Data API and SSM parameters, Drizzle schema, security SQL, migrate job, shared package with data access, RLS settings and IAM auth, access pattern script | 4     |        |
+| 3.3 Cluster              | Cluster stack with ALB and certificate, fanout stack, Cloudflare records                                                                                                              | 2     |        |
+| 3.4 Ducks                | Token module, fastify hook, log line, service construct, ducks service and stack, IAM database authentication from a task                                                             | 3     |        |
+| 3.5 Flocks               | Service, stack, curl walkthrough                                                                                                                                                      | 1.5   |        |
+| 3.6 Messages             | Service, stack, publish                                                                                                                                                               | 1.5   |        |
+| 3.7 Real-time            | Ticket route, websocket service, subscriptions, close at expiry, /ws rule, stack, wscat test                                                                                          | 3     |        |
+| 3.8 Load test            | k6 script for HTTP and sockets, run, record against SC-01 to SC-07                                                                                                                    | 2     |        |
+| 3.9 Web client           | React app, Google sign-in, every flow, web stack, certificate, Cloudflare records                                                                                                     | 4     |        |
+| 3.10 Hardening           | Validation, error responses, negative-path checklist                                                                                                                                  | 1     |        |
+| 3.11 Docs alignment      | README walkthrough, doc updates, deviation ADRs                                                                                                                                       | 1.5   |        |
+| 4.1 Clean deploy         | Destroy, redeploy from the README, fix what it misses                                                                                                                                 | 1.5   |        |
+| 4.2 Smoke checklist      | Every item plus the load test rerun                                                                                                                                                   | 1     |        |
+| 4.3 Publish              | Greps, checks, visibility                                                                                                                                                             | 0.5   |        |
+| Total                    |                                                                                                                                                                                       | 34.5  |        |
 
 Each step carries about plus or minus 30 percent.
