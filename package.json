@@ -3,6 +3,7 @@
   "private": true,
   "scripts": {
     "infra": "pnpm -r --filter @quack/infra",
+    "data": "pnpm -r --filter @quack/data",
     "typecheck": "pnpm -r typecheck",
     "test:unit": "pnpm -r test:unit"
   },

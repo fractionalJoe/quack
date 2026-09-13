@@ -1,0 +1,17 @@
+{
+  "name": "@quack/data",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "cdk": "cdk",
+    "typecheck": "tsc --noEmit",
+    "diff": "cdk diff QuackDataStack --profile ryt.quack.admin",
+    "deploy": "cdk deploy QuackDataStack --profile ryt.quack.admin"
+  },
+  "dependencies": {
+    "@quack/shared": "workspace:*",
+    "aws-cdk-lib": "^2.269.0",
+    "constructs": "^10.8.1"
+  }
+}
