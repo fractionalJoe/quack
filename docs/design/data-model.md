@@ -96,7 +96,7 @@ AP-14 and AP-15 are not data store access patterns; sockets live in websocket ta
 
 ## Row-level security
 
-Every table has row-level security enabled ([Row security policies](https://www.postgresql.org/docs/current/ddl-rowsecurity.html)). The shared package opens a transaction for each request and sets transaction-local settings before any query: app.pond_id from configuration, app.google_subject from the verified ID token, and app.duck_id once the caller's row is known. Sign-in has only the first two. Policies read them with current_setting. A query outside a transaction, or with a setting missing, fails with an error.
+Every table has row-level security enabled ([Row security policies](https://www.postgresql.org/docs/current/ddl-rowsecurity.html)). The db library opens a transaction for each request and sets transaction-local settings before any query: app.pond_id from configuration, app.google_subject from the verified ID token, and app.duck_id once the caller's row is known. Sign-in has only the first two. Policies read them with current_setting. A query outside a transaction, or with a setting missing, fails with an error.
 
 Membership is checked by a function is_member(flock_id, duck_id) that runs with the privileges of the table owner, so it reads memberships without recursing into the memberships policy. Ownership is checked the same way by is_owner(flock_id, duck_id). INSERT and UPDATE conditions are checked against the row as written.
 
@@ -126,4 +126,4 @@ The cascade on flock delete runs under the owner of the referencing tables, so f
 
 ## Schema changes
 
-Tables and indexes are a Drizzle schema in the data stack's project; roles, functions, policies, and grants are one custom SQL migration beside it. Both are applied by a migration step at deploy. The mechanism is in operational-design.md.
+Tables and indexes are a Drizzle schema in the db library; roles, functions, policies, and grants are one custom SQL migration beside it. Both are applied by a migration step at deploy. The mechanism is in operational-design.md.

@@ -40,13 +40,32 @@ The deploy role may assume the CDK bootstrap roles ([Bootstrapping](https://docs
 
 `cdk deploy` from a developer machine is the path for initial setup and troubleshooting. Both paths run the same apps from the same configuration.
 
+## Data store
+
+| Setting             | Value                                                                                                                     |
+| ------------------- | ------------------------------------------------------------------------------------------------------------------------- |
+| Engine              | Aurora PostgreSQL 17.9, Serverless v2                                                                                     |
+| Instances           | One writer, 0 to 2 ACU, pauses after one idle hour                                                                        |
+| Database            | `quack`                                                                                                                   |
+| Master user         | `postgres`; password generated and managed by RDS in Secrets Manager                                                      |
+| Deletion protection | Off, and the cluster is deleted with the stack, so Phase 4 can destroy and redeploy. Production turns it on and retains the cluster on stack delete. |
+
+The data stack publishes these SSM parameters:
+
+| Parameter                     | Value                     | Reader         |
+| ----------------------------- | ------------------------- | -------------- |
+| /quack/data/cluster-arn       | cluster ARN               | migrate job    |
+| /quack/data/secret-arn        | master secret ARN         | migrate job    |
+| /quack/data/endpoint          | writer endpoint hostname  | service stacks |
+| /quack/data/security-group-id | cluster security group ID | service stacks |
+
+A bastion host in the same stack gives a developer machine a path to the cluster through Session Manager port forwarding (README, Local database access).
+
 ## Schema migration
 
-The schema lives in the data stack's project as a Drizzle schema in TypeScript plus a migrations folder. `drizzle-kit generate` writes a migration for tables, indexes, and foreign keys from the schema. Roles, the is_member and is_owner functions, row-level security, policies, and grants are one custom SQL migration in the same folder, created with `drizzle-kit generate --custom`, since Drizzle Kit has no construct for functions or grants ([Drizzle RLS](https://orm.drizzle.team/docs/rls)). Policies stay out of the TypeScript schema so that the tables migration always sorts before the security migration.
+The Drizzle schema and its migrations folder live in the db library, `packages/libs/db`. `drizzle-kit generate` writes the tables migration from the schema; roles, functions, policies, and grants are a custom SQL migration beside it. Statements in custom files are separated by Drizzle's statement-breakpoint marker, one per Data API call.
 
-The migrate job runs `drizzle-kit migrate` after the data stack deploys and before the service stacks. It applies every migration not yet recorded in Drizzle's migrations table, in filename order ([Migrations with Drizzle Kit](https://orm.drizzle.team/docs/kit-overview)). It connects through the RDS Data API with Drizzle Kit's Data API driver ([drizzle.config.ts](https://orm.drizzle.team/docs/drizzle-config-file)), authenticated by the migrate role and the cluster's master secret, which RDS manages in Secrets Manager. The runner needs no VPC access. The data stack enables the Data API on the cluster and writes the cluster ARN and secret ARN to SSM parameters under /quack/data/ for the migrate job. Only the migration uses the Data API and the master secret; services connect with IAM authentication as their own roles (data-model.md, Roles and grants).
-
-The Data API sends one statement per call, at most 64 KiB, and cancels a statement after 45 seconds ([ExecuteStatement](https://docs.aws.amazon.com/rdsdataservice/latest/APIReference/API_ExecuteStatement.html), [Timeouts](https://docs.aws.amazon.com/AmazonRDS/latest/AuroraUserGuide/data-api-timeouts.html)). Custom SQL files carry Drizzle's statement-breakpoint marker between statements. A paused Serverless v2 cluster rejects the first call while it resumes ([DatabaseResumingException](https://docs.aws.amazon.com/rdsdataservice/latest/APIReference/API_ExecuteStatement.html)), so the migrate step retries.
+The migrate job runs after the data stack and before the service stacks. It assumes the migrate role, reads the cluster ARN and secret ARN from the /quack/data/ parameters, waits for a paused cluster to resume, and runs `drizzle-kit migrate` through the RDS Data API with the master secret. Only the migration uses the Data API and the master secret; services connect with IAM authentication as their own roles. The Data API client is pinned to 3.873.0 in `pnpm-workspace.yaml`; `drizzle-kit migrate` fails with newer versions ([drizzle-orm issue 5050](https://github.com/drizzle-team/drizzle-orm/issues/5050)).
 
 ## Logging
 
@@ -67,6 +86,7 @@ Monthly figures. Demo is one month at near-zero load; at scale is the Scale and 
 | NAT gateway                        | about $33, one gateway at $0.045 per hour     | about $100 for three gateways plus the interface endpoints of the scaling limits table                                                               | [VPC pricing](https://aws.amazon.com/vpc/pricing/), [PrivateLink pricing](https://aws.amazon.com/privatelink/pricing/) |
 | Public IPv4 addresses              | about $11, three addresses at $0.005 per hour | about $50: three NAT gateway addresses plus an assumed ten on the load balancer, whose count scales with load                                        | [VPC pricing](https://aws.amazon.com/vpc/pricing/)                                                                     |
 | Secrets Manager, the master secret | $0.40                                         | $0.40                                                                                                                                                | [Secrets Manager pricing](https://aws.amazon.com/secrets-manager/pricing/)                                             |
+| Bastion host                       | about $3, one t4g.nano                        | about $3                                                                                                                                             | [EC2 On-Demand pricing](https://aws.amazon.com/ec2/pricing/on-demand/)                                                 |
 | CloudWatch Logs                    | within the free tier                          | about $3,600: 21.6 billion request lines at an assumed 300 bytes is about 6.5 TB ingested at $0.50 per GB, plus 60 days stored at $0.03 per GB-month | [CloudWatch pricing](https://aws.amazon.com/cloudwatch/pricing/)                                                       |
 | CloudFront and S3, the web client  | within the always-free tier                   | about $2,500: an assumed one full client load per user per week at 0.5 MB and 10 requests, 26 TB and 520 million requests, at United States rates    | [CloudFront pricing](https://aws.amazon.com/cloudfront/pricing/pay-as-you-go/)                                         |
 | RDS Data API, migrations only      | within the free tier                          | rounds to zero: a deploy is a few dozen requests at $0.35 per million                                                                                | [Aurora pricing](https://aws.amazon.com/rds/aurora/pricing/)                                                           |

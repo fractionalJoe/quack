@@ -22,7 +22,7 @@ Once per AWS account, before the first workflow run.
 
 2. Bootstrap CDK in the account and region: `pnpm infra cdk bootstrap --profile ryt.quack.admin`.
 
-3. In the GitHub repository, create the `dev` environment with one variable, `AWS_DEPLOY_ROLE_ARN`, set to the `DeployRoleArn` output of the BootstrapIam stack. Under the environment's deployment branches rule, allow `main` only; the roles trust the environment, so this rule is what limits deploys to `main`.
+3. In the GitHub repository, create the `dev` environment with two variables from the BootstrapIam stack outputs: `AWS_DEPLOY_ROLE_ARN` set to `DeployRoleArn` and `AWS_MIGRATE_ROLE_ARN` set to `MigrateRoleArn`. Under the environment's deployment branches rule, allow `main` only; the roles trust the environment, so this rule is what limits deploys to `main`.
 
 4. On the machine used for local development, install the Session Manager plugin for the AWS CLI. It opens the port-forwarding session to the bastion host that reaches the database ([Install the Session Manager plugin](https://docs.aws.amazon.com/systems-manager/latest/userguide/session-manager-working-with-install-plugin.html)). On Ubuntu and WSL:
 

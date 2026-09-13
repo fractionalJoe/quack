@@ -50,6 +50,7 @@ flowchart LR
 | `websocket` service       | ECS Fargate service; socket sessions and live delivery                                                                                                                                                                  | websocket         |
 | Aurora PostgreSQL         | Serverless v2 cluster, one database, one table per entity, every table carrying pond_id. Each domain owns its tables and is their only writer; row-level security enforces pond and membership on every query (ADR-009) | data              |
 | Message fan-out           | ElastiCache Valkey node; pub/sub topics between tasks, and the ticket handoff                                                                                                                                           | fanout            |
+| Bastion host | EC2 instance in a protected subnet with no inbound rules, reached through Session Manager; forwards a developer's local port to the data store | data |
 | Network                   | VPC, public subnets for the load balancer, protected subnets for tasks, private subnets with no route out for the data store and the fan-out node                                                                       | infra             |
 | Certificates              | ACM in us-east-1; one for quack.ryt.dev on CloudFront, one for api.quack.ryt.dev on the load balancer; validated by CNAME in Cloudflare                                                                                 | web, cluster      |
 
@@ -66,7 +67,7 @@ WebSocket: the browser calls the ducks service's tickets route with its bearer t
 - A socket lives no longer than the ID token that opened it. The ticket carries the token's expiry; the websocket service closes the socket at that time, and the client obtains a fresh token, a fresh ticket, and reconnects.
 - Authorization is record level: membership of the flock for any read or write to it, ownership for delete. Each service enforces the rule for its routes before touching the data store, and row-level security policies in the database enforce pond isolation and membership again on every query, keyed on the pond and caller the shared package sets at the start of each transaction.
 - Each service connects to the database as its own database role with grants on its own domain's tables. Connections use IAM database authentication: the task role signs a short-lived token and the connection uses TLS. No database password exists.
-- Tasks sit in protected subnets, which reach the internet through the NAT gateway. The data store and the fan-out node sit in private subnets with no route out of the VPC. Security groups allow the load balancer to the services, and the services to the data store and the fan-out node. Nothing else reaches them.
+- Tasks sit in protected subnets, which reach the internet through the NAT gateway. The data store and the fan-out node sit in private subnets with no route out of the VPC. Security groups allow the load balancer to the services, the services to the data store and the fan-out node, and the bastion host to the data store. Nothing else reaches them. A developer reaches the bastion through Session Manager, which opens no inbound port.
 - The load balancer sets CORS response headers with the origin fixed to quack.ryt.dev.
 - There is no request throttling in the MVP.
 
@@ -100,10 +101,10 @@ One repository. Each row is a CDK stack in its own project; independent stacks d
 | Stack                              | Contents                                                                                                   | Depends on            |
 | ---------------------------------- | ---------------------------------------------------------------------------------------------------------- | --------------------- |
 | infra                              | VPC, subnets, NAT gateway for image pulls and Google key fetches; shared parameters and roles              | none                  |
-| data                               | Aurora cluster, subnet group, security group, schema migration                                             | infra                 |
+| data                               | Aurora cluster, subnet group, security group, SSM parameters, bastion host                                 | infra                 |
 | fanout                             | ElastiCache Valkey node, subnet group, security group                                                      | infra                 |
 | cluster                            | ECS cluster, load balancer, HTTPS listener, certificate                                                    | infra                 |
 | ducks, flocks, messages, websocket | Task definition, service, target group, listener rule, scaling policy, log group, database role and grants | cluster, data, fanout |
 | web                                | S3 bucket, CloudFront distribution, certificate                                                            | none                  |
 
-Shared code (token verification, data access, fan-out client, logging) is a workspace package used by every service.
+Shared code lives in workspace libraries under `packages/libs`: `shared` holds configuration and is read by every package; `cdk` holds the stack base class; `db` holds the schema, migrations, and data access and is a dependency of the services only.
