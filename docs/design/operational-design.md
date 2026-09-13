@@ -13,7 +13,7 @@ config:
 ---
 flowchart LR
     subgraph s1[Stage 1]
-        network
+        infra
         web
     end
     subgraph s2[Stage 2]
@@ -30,7 +30,7 @@ flowchart LR
         messages
         websocket
     end
-    network --> data & cluster & fanout
+    infra --> data & cluster & fanout
     data --> migrate
     migrate ~~~ ducks & flocks & messages & websocket
     migrate & cluster & fanout --> s4

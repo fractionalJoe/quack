@@ -1,11 +1,15 @@
 {
-  "name": "infra",
+  "name": "@quack/infra",
   "version": "0.0.0",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
+  "private": true,
   "type": "module",
-  "devDependencies": {
-    "cdk": "^2.1141.0"
+  "scripts": {
+    "cdk": "cdk",
+    "build": "tsc"
+  },
+  "dependencies": {
+    "@quack/shared": "workspace:*",
+    "aws-cdk-lib": "^2.269.0",
+    "constructs": "^10.8.1"
   }
 }

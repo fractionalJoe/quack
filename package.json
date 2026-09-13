@@ -2,7 +2,8 @@
   "name": "quack",
   "private": true,
   "scripts": {
-    "typecheck": "pnpm -r typecheck"
+    "infra": "pnpm -r --filter @quack/infra",
+    "build": "pnpm -r build"
   },
   "author": "Joe Martin",
   "type": "module",
