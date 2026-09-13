@@ -3,7 +3,8 @@
   "private": true,
   "scripts": {
     "infra": "pnpm -r --filter @quack/infra",
-    "build": "pnpm -r build"
+    "build": "pnpm -r build",
+    "test": "pnpm -r test"
   },
   "author": "Joe Martin",
   "type": "module",
