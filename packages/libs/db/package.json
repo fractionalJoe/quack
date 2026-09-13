@@ -8,6 +8,8 @@
   },
   "scripts": {
     "build": "tsc",
+    "generate": "drizzle-kit generate",
+    "migrate": "drizzle-kit migrate",
     "typecheck": "tsc --noEmit",
     "test:unit": "tsx --test src/**/*.test.ts"
   },
@@ -15,6 +17,7 @@
     "drizzle-orm": "^0.45.2"
   },
   "devDependencies": {
+    "@aws-sdk/client-rds-data": "^3.1131.0",
     "drizzle-kit": "^0.31.10"
   }
 }
