@@ -179,20 +179,11 @@ importers:
         specifier: ^7.0.2
         version: 7.0.2
 
-  packages/cdk:
-    dependencies:
-      aws-cdk-lib:
-        specifier: ^2.269.0
-        version: 2.269.0(constructs@10.8.1)
-      constructs:
-        specifier: ^10.8.1
-        version: 10.8.1
-
   packages/data:
     dependencies:
       '@quack/shared':
         specifier: workspace:*
-        version: link:../shared
+        version: link:../libs/shared
       aws-cdk-lib:
         specifier: ^2.269.0
         version: 2.269.0(constructs@10.8.1)
@@ -204,7 +195,7 @@ importers:
     dependencies:
       '@quack/shared':
         specifier: workspace:*
-        version: link:../shared
+        version: link:../libs/shared
       aws-cdk-lib:
         specifier: ^2.269.0
         version: 2.269.0(constructs@10.8.1)
@@ -212,7 +203,16 @@ importers:
         specifier: ^10.8.1
         version: 10.8.1
 
-  packages/shared: {}
+  packages/libs/cdk:
+    dependencies:
+      aws-cdk-lib:
+        specifier: ^2.269.0
+        version: 2.269.0(constructs@10.8.1)
+      constructs:
+        specifier: ^10.8.1
+        version: 10.8.1
+
+  packages/libs/shared: {}
 
 packages:
 
