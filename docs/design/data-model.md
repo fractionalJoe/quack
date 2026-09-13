@@ -39,7 +39,7 @@ erDiagram
         uuid duck_id PK, FK "NOT NULL"
         uuid pond_id FK "NOT NULL"
         uuid added_by FK "NOT NULL"
-        timestamptz added_at "NOT NULL"
+        timestamptz created_at "NOT NULL"
     }
     messages {
         uuid message_id PK "NOT NULL"
