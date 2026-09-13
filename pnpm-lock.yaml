@@ -227,6 +227,21 @@ importers:
         specifier: ^7.0.2
         version: 7.0.2
 
+  packages/compute:
+    dependencies:
+      '@quack/cdk':
+        specifier: workspace:*
+        version: link:../libs/cdk
+      '@quack/shared':
+        specifier: workspace:*
+        version: link:../libs/shared
+      aws-cdk-lib:
+        specifier: ^2.269.0
+        version: 2.269.0(constructs@10.8.1)
+      constructs:
+        specifier: ^10.8.1
+        version: 10.8.1
+
   packages/data:
     dependencies:
       '@quack/cdk':

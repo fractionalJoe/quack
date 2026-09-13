@@ -3,6 +3,7 @@
   "private": true,
   "scripts": {
     "cdk": "pnpm --filter @quack/cdk",
+    "compute": "pnpm --filter @quack/compute",
     "data": "pnpm --filter @quack/data",
     "db": "pnpm --filter @quack/db",
     "infra": "pnpm --filter @quack/infra",

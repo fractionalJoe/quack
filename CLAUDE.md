@@ -1,6 +1,6 @@
 # Quack
 
-Minimal Slack-like chat on AWS (CDK, TypeScript). Meant to demonstrate the architecture and implementation of a minimal real-time messaging service. Channels are called flocks. Tenants are called ponds. PLAN.md is the working plan; work it top to bottom.
+Minimal Slack-like chat on AWS (CDK, TypeScript). Meant to demonstrate the architecture and implementation of a minimal real-time messaging service. Channels are called flocks. Tenants are called ponds. docs/discovery/PLAN.md is the working plan; work it top to bottom.
 
 ## Working rules
 
