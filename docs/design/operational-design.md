@@ -22,6 +22,10 @@ aws cloudformation deploy \
   --parameter-overrides GitHubRepo=quack
 ```
 
+## Google OAuth client
+
+The web client's OAuth client ID is issued by the Google Cloud project `quack` and managed at [Google Auth Platform, Clients](https://console.cloud.google.com/auth/clients?organizationId=464739199584&project=quack-508515). It is a web application client whose authorized JavaScript origins are the web hostname and the local Vite origin; it has no redirect URIs, and its client secret is unused. The ID is in config.json (architecture.md, Configuration). While the consent screen is in testing, only the accounts listed under Audience can sign in.
+
 ## Schema migration
 
 The schema lives in the data stack's project as a Drizzle schema in TypeScript plus a migrations folder. `drizzle-kit generate` writes a migration for tables, indexes, and foreign keys from the schema. Roles, the is_member and is_owner functions, row-level security, policies, and grants are one custom SQL migration in the same folder, created with `drizzle-kit generate --custom`, since Drizzle Kit has no construct for functions or grants ([Drizzle RLS](https://orm.drizzle.team/docs/rls)). Policies stay out of the TypeScript schema so that the tables migration always sorts before the security migration.
