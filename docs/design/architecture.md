@@ -39,19 +39,19 @@ flowchart LR
     WS -.-> Google
 ```
 
-| Component                 | Runs as                                                                                                                                 | Stack               |
-| ------------------------- | --------------------------------------------------------------------------------------------------------------------------------------- | ------------------- |
-| Cloudflare DNS | Holds the zone for ryt.dev. DNS-only CNAME records point quack.ryt.dev at CloudFront and api.quack.ryt.dev at the load balancer, plus the CNAMEs that validate the certificates. Records are entered by hand. | none, outside AWS |
-| Web client | Static files on S3, served by CloudFront at quack.ryt.dev | web |
-| Application Load Balancer | HTTPS listener on api.quack.ryt.dev; path rules to services; WebSocket upgrades pass through                                            | cluster             |
-| `ducks` service           | ECS Fargate service; sign-in, me, tickets, duck list                                                                                     | ducks               |
-| `flocks` service          | ECS Fargate service; flocks and memberships                                                                                             | flocks              |
-| `messages` service        | ECS Fargate service; send and history                                                                                                   | messages            |
-| `websocket` service       | ECS Fargate service; socket sessions and live delivery                                                                            | websocket           |
-| Aurora PostgreSQL | Serverless v2 cluster, one database, one table per entity, every table carrying pond_id. Each domain owns its tables and is their only writer; row-level security enforces pond and membership on every query (ADR-009) | data |
-| Message fan-out | ElastiCache Valkey node; pub/sub topics between tasks, and the ticket handoff | fanout |
-| Network                   | VPC, public subnets for the load balancer, protected subnets for tasks, private subnets with no route out for the data store and the fan-out node | infra               |
-| Certificates              | ACM in us-east-1; one for quack.ryt.dev on CloudFront, one for api.quack.ryt.dev on the load balancer; validated by CNAME in Cloudflare | web, cluster        |
+| Component                 | Runs as                                                                                                                                                                                                                 | Stack             |
+| ------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------- |
+| Cloudflare DNS            | Holds the zone for ryt.dev. DNS-only CNAME records point quack.ryt.dev at CloudFront and api.quack.ryt.dev at the load balancer, plus the CNAMEs that validate the certificates. Records are entered by hand.           | none, outside AWS |
+| Web client                | Static files on S3, served by CloudFront at quack.ryt.dev                                                                                                                                                               | web               |
+| Application Load Balancer | HTTPS listener on api.quack.ryt.dev; path rules to services; WebSocket upgrades pass through                                                                                                                            | cluster           |
+| `ducks` service           | ECS Fargate service; sign-in, me, tickets, duck list                                                                                                                                                                    | ducks             |
+| `flocks` service          | ECS Fargate service; flocks and memberships                                                                                                                                                                             | flocks            |
+| `messages` service        | ECS Fargate service; send and history                                                                                                                                                                                   | messages          |
+| `websocket` service       | ECS Fargate service; socket sessions and live delivery                                                                                                                                                                  | websocket         |
+| Aurora PostgreSQL         | Serverless v2 cluster, one database, one table per entity, every table carrying pond_id. Each domain owns its tables and is their only writer; row-level security enforces pond and membership on every query (ADR-009) | data              |
+| Message fan-out           | ElastiCache Valkey node; pub/sub topics between tasks, and the ticket handoff                                                                                                                                           | fanout            |
+| Network                   | VPC, public subnets for the load balancer, protected subnets for tasks, private subnets with no route out for the data store and the fan-out node                                                                       | infra             |
+| Certificates              | ACM in us-east-1; one for quack.ryt.dev on CloudFront, one for api.quack.ryt.dev on the load balancer; validated by CNAME in Cloudflare                                                                                 | web, cluster      |
 
 ## Request paths
 
@@ -82,12 +82,12 @@ Each domain owns its tables and is the only writer. A service may read another d
 
 Tickets are the one deliberate split: the ducks service issues a ticket into the fan-out store and the websocket service deletes it on redeem. The ticket is a handoff between the two, not a data store record, and ADR-008 does not apply to it.
 
-| Reading service | Owning domain | Record     | Purpose                                                      |
-| --------------- | ------------- | ---------- | ------------------------------------------------------------ |
-| messages        | flocks        | membership | Membership check before send and before history              |
-| websocket       | flocks        | membership | Topics to subscribe on connect; membership check before push |
+| Reading service | Owning domain | Record     | Purpose                                                            |
+| --------------- | ------------- | ---------- | ------------------------------------------------------------------ |
+| messages        | flocks        | membership | Membership check before send and before history                    |
+| websocket       | flocks        | membership | Topics to subscribe on connect; membership check before push       |
 | flocks          | ducks         | duck       | Caller lookup on every request; display names when listing members |
-| messages        | ducks         | duck       | Caller lookup on every request                               |
+| messages        | ducks         | duck       | Caller lookup on every request                                     |
 
 ## Ponds
 
@@ -97,13 +97,13 @@ A pond is a tenant. The MVP serves one pond with a fixed pond ID. Every record c
 
 One repository. Each row is a CDK stack in its own project; independent stacks deploy in parallel.
 
-| Stack                              | Contents                                                                                       | Depends on                  |
-| ---------------------------------- | ---------------------------------------------------------------------------------------------- | --------------------------- |
-| infra                              | VPC, subnets, NAT gateway for image pulls and Google key fetches; shared parameters and roles   | none                        |
-| data                               | Aurora cluster, subnet group, security group, schema migration                                 | infra                       |
-| fanout | ElastiCache Valkey node, subnet group, security group | infra |
-| cluster | ECS cluster, load balancer, HTTPS listener, certificate | infra |
+| Stack                              | Contents                                                                                                   | Depends on            |
+| ---------------------------------- | ---------------------------------------------------------------------------------------------------------- | --------------------- |
+| infra                              | VPC, subnets, NAT gateway for image pulls and Google key fetches; shared parameters and roles              | none                  |
+| data                               | Aurora cluster, subnet group, security group, schema migration                                             | infra                 |
+| fanout                             | ElastiCache Valkey node, subnet group, security group                                                      | infra                 |
+| cluster                            | ECS cluster, load balancer, HTTPS listener, certificate                                                    | infra                 |
 | ducks, flocks, messages, websocket | Task definition, service, target group, listener rule, scaling policy, log group, database role and grants | cluster, data, fanout |
-| web                                | S3 bucket, CloudFront distribution, certificate                                                | none                        |
+| web                                | S3 bucket, CloudFront distribution, certificate                                                            | none                  |
 
 Shared code (token verification, data access, fan-out client, logging) is a workspace package used by every service.

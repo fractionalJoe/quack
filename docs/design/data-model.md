@@ -75,22 +75,22 @@ Primary keys are the entity's own ID; a membership's key is (flock_id, duck_id) 
 
 Row-level security adds the pond filter to every query, so pond_id appears in no WHERE clause. The index is the primary key unless stated.
 
-| AP | Access pattern | Query | Service |
-| --- | --- | --- | --- |
-| AP-01 | Upsert user on sign-in | Insert a duck; if (pond_id, google_subject) already exists, update display_name instead | ducks |
-| AP-02 | Read one user by duckId | Select a duck WHERE duck_id = ? | ducks |
-| AP-03 | Create flock | Insert the flock, then insert the owner's membership, in one transaction | flocks |
-| AP-04 | Read one flock by flockId | Select a flock WHERE flock_id = ? | flocks |
-| AP-05 | Delete flock | Delete the flock WHERE flock_id = ?; the cascade runs AP-10 and AP-13 | flocks |
-| AP-06 | Check membership of one user in one flock | Select a membership WHERE flock_id = ? AND duck_id = ?; the policies run the same check on every flock query | every service |
-| AP-07 | List flocks for a user | Select memberships WHERE duck_id = ?, joined to flocks; uses the (duck_id, flock_id) index | flocks; websocket under ADR-008 |
-| AP-08 | List members of a flock | Select memberships WHERE flock_id = ?, joined to ducks for display names | flocks |
-| AP-09 | Add membership | Insert a membership | flocks |
-| AP-10 | Delete all memberships in a flock | Run by the cascade in AP-05 | database |
-| AP-11 | Put message | Insert a message | messages |
-| AP-12 | Read latest 50 messages in a flock, newest first | Select messages WHERE flock_id = ? ORDER BY message_id DESC LIMIT 50; uses the (flock_id, message_id) index | messages |
-| AP-13 | Delete all messages in a flock | Run by the cascade in AP-05 | database |
-| AP-16 | List ducks in the pond | Select ducks | ducks |
+| AP    | Access pattern                                   | Query                                                                                                        | Service                         |
+| ----- | ------------------------------------------------ | ------------------------------------------------------------------------------------------------------------ | ------------------------------- |
+| AP-01 | Upsert user on sign-in                           | Insert a duck; if (pond_id, google_subject) already exists, update display_name instead                      | ducks                           |
+| AP-02 | Read one user by duckId                          | Select a duck WHERE duck_id = ?                                                                              | ducks                           |
+| AP-03 | Create flock                                     | Insert the flock, then insert the owner's membership, in one transaction                                     | flocks                          |
+| AP-04 | Read one flock by flockId                        | Select a flock WHERE flock_id = ?                                                                            | flocks                          |
+| AP-05 | Delete flock                                     | Delete the flock WHERE flock_id = ?; the cascade runs AP-10 and AP-13                                        | flocks                          |
+| AP-06 | Check membership of one user in one flock        | Select a membership WHERE flock_id = ? AND duck_id = ?; the policies run the same check on every flock query | every service                   |
+| AP-07 | List flocks for a user                           | Select memberships WHERE duck_id = ?, joined to flocks; uses the (duck_id, flock_id) index                   | flocks; websocket under ADR-008 |
+| AP-08 | List members of a flock                          | Select memberships WHERE flock_id = ?, joined to ducks for display names                                     | flocks                          |
+| AP-09 | Add membership                                   | Insert a membership                                                                                          | flocks                          |
+| AP-10 | Delete all memberships in a flock                | Run by the cascade in AP-05                                                                                  | database                        |
+| AP-11 | Put message                                      | Insert a message                                                                                             | messages                        |
+| AP-12 | Read latest 50 messages in a flock, newest first | Select messages WHERE flock_id = ? ORDER BY message_id DESC LIMIT 50; uses the (flock_id, message_id) index  | messages                        |
+| AP-13 | Delete all messages in a flock                   | Run by the cascade in AP-05                                                                                  | database                        |
+| AP-16 | List ducks in the pond                           | Select ducks                                                                                                 | ducks                           |
 
 AP-14 and AP-15 are not data store access patterns; sockets live in websocket task memory and delivery goes through the fan-out topic (ADR-005).
 
@@ -100,12 +100,12 @@ Every table has row-level security enabled ([Row security policies](https://www.
 
 Membership is checked by a function is_member(flock_id, duck_id) that runs with the privileges of the table owner, so it reads memberships without recursing into the memberships policy. Ownership is checked the same way by is_owner(flock_id, duck_id). INSERT and UPDATE conditions are checked against the row as written.
 
-| Table       | SELECT                              | INSERT                                                                   | UPDATE       | DELETE                               |
-| ----------- | ----------------------------------- | ------------------------------------------------------------------------ | ------------ | ------------------------------------ |
-| ducks | pond matches | pond matches and google_subject is the caller's | pond matches and google_subject is the caller's | none |
-| flocks      | pond matches and caller is a member | pond matches and owner_id is the caller                                  | none         | pond matches and caller is the owner |
-| memberships | pond matches and caller is a member | two policies, either passes: create flock, caller is the flock's owner and duck_id is the caller; add member, caller is a member. Both: pond matches and added_by is the caller | none         | none in the MVP (FC-05)              |
-| messages    | pond matches and caller is a member | pond matches and caller is a member, sender_id is the caller             | none         | none                                 |
+| Table       | SELECT                              | INSERT                                                                                                                                                                          | UPDATE                                          | DELETE                               |
+| ----------- | ----------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------- | ------------------------------------ |
+| ducks       | pond matches                        | pond matches and google_subject is the caller's                                                                                                                                 | pond matches and google_subject is the caller's | none                                 |
+| flocks      | pond matches and caller is a member | pond matches and owner_id is the caller                                                                                                                                         | none                                            | pond matches and caller is the owner |
+| memberships | pond matches and caller is a member | two policies, either passes: create flock, caller is the flock's owner and duck_id is the caller; add member, caller is a member. Both: pond matches and added_by is the caller | none                                            | none in the MVP (FC-05)              |
+| messages    | pond matches and caller is a member | pond matches and caller is a member, sender_id is the caller                                                                                                                    | none                                            | none                                 |
 
 Foreign key cascades bypass row security, so deleting a flock removes its memberships and messages regardless of policy. Ducks are readable by every member of the pond because adding a member needs to find any signed-in user (FR-04).
 

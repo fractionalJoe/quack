@@ -7,6 +7,7 @@
     ".": "./src/index.ts"
   },
   "scripts": {
+    "build": "tsc",
     "typecheck": "tsc --noEmit",
     "test:unit": "tsx --test src/**/*.test.ts"
   },

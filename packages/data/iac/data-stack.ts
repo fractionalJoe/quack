@@ -3,6 +3,7 @@ import type { Construct } from "constructs";
 import { AuroraCluster } from "./lib/aurora-cluster.ts";
 import { Vpc } from "aws-cdk-lib/aws-ec2";
 import { StringParameter } from "aws-cdk-lib/aws-ssm";
+import { QuackStack } from "@quack/cdk";
 
 export interface DataStackProps extends StackProps {
   autoPauseSeconds: number;
@@ -10,7 +11,7 @@ export interface DataStackProps extends StackProps {
   vpcName: string;
 }
 
-export class DataStack extends Stack {
+export class DataStack extends QuackStack {
   constructor(scope: Construct, props: DataStackProps) {
     super(scope, "QuackDataStack", props);
 
@@ -24,31 +25,13 @@ export class DataStack extends Stack {
       vpc,
     });
 
-    this.addOutput("ClusterArn", cluster.clusterArn, "/quack/data/cluster-arn");
-    this.addOutput(
-      "ClusterSecretArn",
-      cluster.secretArn,
-      "/quack/data/secret-arn",
-    );
-    this.addOutput("ClusterEndpoint", cluster.endpoint, "/quack/data/endpoint");
-    this.addOutput(
+    this.addStackOutput("ClusterArn", cluster.clusterArn, "/quack/data/cluster-arn");
+    this.addStackOutput("ClusterSecretArn", cluster.secretArn, "/quack/data/secret-arn");
+    this.addStackOutput("ClusterEndpoint", cluster.endpoint, "/quack/data/endpoint");
+    this.addStackOutput(
       "ClusterSecurityGroupId",
       cluster.clusterSecurityGroupId,
       "/quack/data/security-group-id",
     );
-  }
-
-  private addOutput(
-    logicalName: string,
-    value: string,
-    parameterName?: string,
-  ): void {
-    new CfnOutput(this, logicalName, { value });
-    if (parameterName) {
-      new StringParameter(this, `${logicalName}Param`, {
-        parameterName,
-        stringValue: value,
-      });
-    }
   }
 }

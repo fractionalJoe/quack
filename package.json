@@ -5,8 +5,10 @@
     "infra": "pnpm -r --filter @quack/infra",
     "data": "pnpm -r --filter @quack/data",
     "cdk": "pnpm -r --filter @quack/cdk",
+    "build": "pnpm -r build",
     "typecheck": "pnpm -r typecheck",
-    "test:unit": "pnpm -r test:unit"
+    "test:unit": "pnpm -r test:unit",
+    "format": "prettier --write ."
   },
   "author": "Joe Martin",
   "type": "module",
@@ -14,6 +16,7 @@
   "devDependencies": {
     "@types/node": "^26.5.1",
     "aws-cdk": "^2.1141.0",
+    "prettier": "^3.9.6",
     "tsx": "^4.23.13",
     "typescript": "^7.0.2"
   }

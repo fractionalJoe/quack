@@ -11,6 +11,7 @@
     "synth": "cdk synth QuackDataStack --profile ryt.quack.admin"
   },
   "dependencies": {
+    "@quack/cdk": "workspace:*",
     "@quack/shared": "workspace:*",
     "aws-cdk-lib": "^2.269.0",
     "constructs": "^10.8.1"
