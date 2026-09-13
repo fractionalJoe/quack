@@ -87,3 +87,27 @@ Prove the MVP deploys to the dev account from the repo alone and publish the rep
 1. [ ] Clean deploy: destroy the dev stacks and redeploy following only the README. Result: fresh deployment with no step outside the README.
 2. [ ] Smoke checklist on the fresh deployment: sign in, create and list a flock, add a member, send, receive live in a second session, history on open, delete a flock, load test rerun. Result: every item passes, recorded here.
 3. [ ] Publish: remove plan-prompt.md; grep for em dashes and for learning, practice, and interview references; confirm numeric claims are sourced and the AI disclosure sentence is present; decide visibility; push. Result: repo public at its final URL.
+
+## Revised estimation
+
+**2029-09-13 19:45** Bottom-up estimate of the remaining work, made after Phase 2 closed at 7 hours 35 minutes against 3. One sitting per step; the first deploy of each new kind of thing (Actions OIDC, IAM database authentication from a task, WebSockets through the load balancer) is where a step goes over.
+
+| Step                | Work                                                                                                                                                                | Hours |
+| ------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----- |
+| 3.1 Environment     | Account bootstrap template, OIDC provider and deploy role, CDK bootstrap, SSM parameter                                                                             | 1     |
+| 3.2 Scaffold        | Workspace, eight CDK projects, Actions workflow, first deploy through Actions                                                                                       | 2     |
+| 3.3 Data layer      | Network and data stacks, Aurora with Data API and IAM auth, Drizzle schema, security SQL, migrate step, shared data access with RLS settings, access pattern script | 4     |
+| 3.4 Sign-in         | Cluster stack with ALB and certificate, Cloudflare records, token module, fastify hook, ducks service and stack, IAM DB auth from a task                            | 3     |
+| 3.5 Flocks          | Service, stack, curl walkthrough                                                                                                                                    | 1.5   |
+| 3.6 Messages        | Service, stack, fanout stack, publish                                                                                                                               | 1.5   |
+| 3.7 Real-time       | Ticket routes, websocket service, subscriptions, close at expiry, ALB path, stack, wscat test                                                                       | 3     |
+| 3.8 Load test       | k6 script for HTTP and sockets, run, record against SC-01 to SC-07                                                                                                  | 2     |
+| 3.9 Web client      | React app, Google sign-in, every flow, web stack, certificate                                                                                                       | 4     |
+| 3.10 Hardening      | Validation, error responses, log lines, negative-path checklist                                                                                                     | 1.5   |
+| 3.11 Docs alignment | README walkthrough, doc updates, deviation ADRs                                                                                                                     | 1.5   |
+| 4.1 Clean deploy    | Destroy, redeploy from the README, fix what it misses                                                                                                               | 1.5   |
+| 4.2 Smoke checklist | Every item plus the load test rerun                                                                                                                                 | 1     |
+| 4.3 Publish         | Greps, checks, visibility                                                                                                                                           | 0.5   |
+| Total               |                                                                                                                                                                     | 28    |
+
+Each step carries about plus or minus 30 percent.
