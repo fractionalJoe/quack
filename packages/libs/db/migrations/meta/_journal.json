@@ -8,6 +8,13 @@
       "when": 1789335412090,
       "tag": "0000_tables",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1789335463931,
+      "tag": "0001_security",
+      "breakpoints": true
     }
   ]
 }
