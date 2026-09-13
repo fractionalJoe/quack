@@ -41,12 +41,13 @@ jobs:
           filters: |
             infra:
               - packages/infra/**
+              - packages/libs/cdk/**
               - packages/libs/shared/**
               - .github/**
             data:
               - packages/data/**
-              - packages/libs/shared/**
               - packages/libs/cdk/**
+              - packages/libs/shared/**
               - .github/**
 
   build:
