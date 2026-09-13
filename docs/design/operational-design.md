@@ -42,12 +42,12 @@ The deploy role may assume the CDK bootstrap roles ([Bootstrapping](https://docs
 
 ## Data store
 
-| Setting             | Value                                                                                                                     |
-| ------------------- | ------------------------------------------------------------------------------------------------------------------------- |
-| Engine              | Aurora PostgreSQL 17.9, Serverless v2                                                                                     |
-| Instances           | One writer, 0 to 2 ACU, pauses after one idle hour                                                                        |
-| Database            | `quack`                                                                                                                   |
-| Master user         | `postgres`; password generated and managed by RDS in Secrets Manager                                                      |
+| Setting             | Value                                                                                                                                                |
+| ------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Engine              | Aurora PostgreSQL 17.9, Serverless v2                                                                                                                |
+| Instances           | One writer, 0 to 2 ACU, pauses after one idle hour                                                                                                   |
+| Database            | `quack`                                                                                                                                              |
+| Master user         | `postgres`; password generated and managed by RDS in Secrets Manager                                                                                 |
 | Deletion protection | Off, and the cluster is deleted with the stack, so Phase 4 can destroy and redeploy. Production turns it on and retains the cluster on stack delete. |
 
 The data stack publishes these SSM parameters:
