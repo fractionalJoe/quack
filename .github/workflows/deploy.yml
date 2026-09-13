@@ -19,6 +19,10 @@ on:
         description: Deploy DataStack
         type: boolean
         default: false
+      migrate:
+        description: Deploy Migrations
+        type: boolean
+        default: false
 
 permissions:
   id-token: write
@@ -30,6 +34,7 @@ jobs:
     outputs:
       infra: ${{ steps.filter.outputs.infra }}
       data: ${{ steps.filter.outputs.data }}
+      migrate: ${{ steps.filter.outputs.migrate }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v6
@@ -48,6 +53,9 @@ jobs:
               - packages/data/**
               - packages/libs/cdk/**
               - packages/libs/shared/**
+              - .github/**
+            migrate:
+              - packages/libs/db/**
               - .github/**
 
   build:
@@ -119,3 +127,45 @@ jobs:
 
       - name: Deploy QuackDataStack
         run: pnpm data cdk deploy QuackDataStack --require-approval never
+
+  migrate:
+    needs: [changes, build, data]
+    # Same shape as data: build must pass, data must pass or be skipped,
+    # then run on a migrations change or on dispatch with the migrate input.
+    if: >-
+      !cancelled() && needs.build.result == 'success' &&
+      (needs.data.result == 'success' || needs.data.result == 'skipped') &&
+      (
+        needs.changes.outputs.migrate == 'true' ||
+        (github.event_name == 'workflow_dispatch' && inputs.migrate)
+      )
+    runs-on: ubuntu-latest
+    environment: ${{ github.event.inputs.deploy_environment || 'dev' }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
+      - name: Read region
+        id: config
+        run: echo "region=$(jq -r .primary.region config.json)" >> "$GITHUB_OUTPUT"
+
+      - name: Setup
+        uses: ./.github/actions/setup
+        with:
+          role-to-assume: ${{ vars.AWS_MIGRATE_ROLE_ARN }}
+          aws-region: ${{ steps.config.outputs.region }}
+
+      - name: Read data parameters
+        run: |
+          echo "AWS_RDS_ARN=$(aws ssm get-parameter --name /quack/data/cluster-arn --query Parameter.Value --output text)" >> "$GITHUB_ENV"
+          echo "AWS_RDS_SECRET_ARN=$(aws ssm get-parameter --name /quack/data/secret-arn --query Parameter.Value --output text)" >> "$GITHUB_ENV"
+
+      - name: Migrate
+        # A paused cluster rejects the first call while it resumes (DatabaseResumingException).
+        run: |
+          for attempt in {1..12}; do
+            pnpm db migrate && exit 0
+            echo "attempt $attempt failed, retrying in 15s"
+            sleep 15
+          done
+          exit 1
