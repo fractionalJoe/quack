@@ -7,7 +7,8 @@
     "cdk": "cdk",
     "typecheck": "tsc --noEmit",
     "diff": "cdk diff QuackDataStack --profile ryt.quack.admin",
-    "deploy": "cdk deploy QuackDataStack --profile ryt.quack.admin"
+    "deploy": "cdk deploy QuackDataStack --profile ryt.quack.admin",
+    "synth": "cdk synth QuackDataStack --profile ryt.quack.admin"
   },
   "dependencies": {
     "@quack/shared": "workspace:*",

@@ -8,4 +8,7 @@ if (!account) throw new Error("CDK_DEFAULT_ACCOUNT is not set; run with AWS cred
 const app = new App();
 new DataStack(app, {
   env: { account, region: config.primary.region },
+  autoPauseSeconds: config.primary.auroraCluster.autoPauseSeconds,
+  databaseName: config.primary.auroraCluster.defaultDatabaseName,
+  vpcName: config.primary.vpcName,
 });

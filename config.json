@@ -4,6 +4,10 @@
     "webHostname": "quack.ryt.dev",
     "apiHostname": "api.quack.ryt.dev",
     "googleClientId": "285650328628-trsd6jfn0p27anjfdtpj9a4h8ftarrmh.apps.googleusercontent.com",
-    "vpcName": "vpc-quack"
+    "vpcName": "vpc-quack",
+    "auroraCluster": {
+      "autoPauseSeconds": 3600,
+      "defaultDatabaseName": "quack"
+    }
   }
 }
