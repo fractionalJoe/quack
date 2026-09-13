@@ -6,10 +6,6 @@ inputs:
     description: Deploy role ARN to assume. Omit to skip credential configuration.
     required: false
     default: ""
-  aws-region:
-    description: Region to configure credentials for. Required with role-to-assume.
-    required: false
-    default: ""
 
 runs:
   using: composite
@@ -26,9 +22,14 @@ runs:
         run_install: |
           - args: [--frozen-lockfile]
 
+    - name: Read region
+      id: config
+      shell: bash
+      run: echo "region=$(jq -r .primary.region config.json)" >> "$GITHUB_OUTPUT"
+
     - name: Configure AWS credentials
       if: inputs.role-to-assume != ''
       uses: aws-actions/configure-aws-credentials@v6
       with:
         role-to-assume: ${{ inputs.role-to-assume }}
-        aws-region: ${{ inputs.aws-region }}
+        aws-region: ${{ steps.config.outputs.region }}

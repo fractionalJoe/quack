@@ -15,6 +15,10 @@ on:
         description: Deploy InfraStack
         type: boolean
         default: false
+      compute:
+        description: Deploy ComputeStack
+        type: boolean
+        default: false
       data:
         description: Deploy DataStack
         type: boolean
@@ -33,6 +37,7 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       infra: ${{ steps.filter.outputs.infra }}
+      compute: ${{ steps.filter.outputs.compute }}
       data: ${{ steps.filter.outputs.data }}
       migrate: ${{ steps.filter.outputs.migrate }}
     steps:
@@ -46,6 +51,11 @@ jobs:
           filters: |
             infra:
               - packages/infra/**
+              - packages/libs/cdk/**
+              - packages/libs/shared/**
+              - .github/**
+            compute:
+              - packages/compute/**
               - packages/libs/cdk/**
               - packages/libs/shared/**
               - .github/**
@@ -82,18 +92,41 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v6
 
-      - name: Read region
-        id: config
-        run: echo "region=$(jq -r .primary.region config.json)" >> "$GITHUB_OUTPUT"
+      - name: Setup
+        uses: ./.github/actions/setup
+        with:
+          role-to-assume: ${{ vars.AWS_DEPLOY_ROLE_ARN }}
+
+      - name: Deploy QuackInfraStack
+        run: pnpm infra cdk deploy QuackInfraStack --require-approval never
+
+  compute:
+    needs: [changes, build, infra]
+    # !cancelled() replaces the implied success(), which would skip this job
+    # whenever infra is skipped. Build must pass and infra must pass or be
+    # skipped; then run on a compute change or on dispatch with the compute input.
+    if: >-
+      !cancelled() && needs.build.result == 'success' && 
+      (needs.infra.result == 'success' || needs.infra.result == 'skipped') &&
+      (
+        needs.changes.outputs.compute == 'true' || 
+        (github.event_name == 'workflow_dispatch' && inputs.compute)
+      )
+    runs-on: ubuntu-latest
+    # environment sets the OIDC subject to repo:<org>/<repo>:environment:<name>,
+    # the only subject BootstrapIam.yaml trusts.
+    environment: ${{ github.event.inputs.deploy_environment || 'dev' }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
 
       - name: Setup
         uses: ./.github/actions/setup
         with:
           role-to-assume: ${{ vars.AWS_DEPLOY_ROLE_ARN }}
-          aws-region: ${{ steps.config.outputs.region }}
 
-      - name: Deploy QuackInfraStack
-        run: pnpm infra cdk deploy QuackInfraStack --require-approval never
+      - name: Deploy QuackComputeStack
+        run: pnpm compute cdk deploy QuackComputeStack --require-approval never
 
   data:
     needs: [changes, build, infra]
@@ -115,15 +148,10 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v6
 
-      - name: Read region
-        id: config
-        run: echo "region=$(jq -r .primary.region config.json)" >> "$GITHUB_OUTPUT"
-
       - name: Setup
         uses: ./.github/actions/setup
         with:
           role-to-assume: ${{ vars.AWS_DEPLOY_ROLE_ARN }}
-          aws-region: ${{ steps.config.outputs.region }}
 
       - name: Deploy QuackDataStack
         run: pnpm data cdk deploy QuackDataStack --require-approval never
@@ -145,15 +173,10 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v6
 
-      - name: Read region
-        id: config
-        run: echo "region=$(jq -r .primary.region config.json)" >> "$GITHUB_OUTPUT"
-
       - name: Setup
         uses: ./.github/actions/setup
         with:
           role-to-assume: ${{ vars.AWS_MIGRATE_ROLE_ARN }}
-          aws-region: ${{ steps.config.outputs.region }}
 
       - name: Read data parameters
         run: |

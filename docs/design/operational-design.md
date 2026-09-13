@@ -18,7 +18,7 @@ flowchart LR
     end
     subgraph s2[Stage 2]
         data
-        cluster
+        compute
         fanout
     end
     subgraph s3[Stage 3]
@@ -30,10 +30,10 @@ flowchart LR
         messages
         websocket
     end
-    infra --> data & cluster & fanout
+    infra --> data & compute & fanout
     data --> migrate
     migrate ~~~ ducks & flocks & messages & websocket
-    migrate & cluster & fanout --> s4
+    migrate & compute & fanout --> s4
 ```
 
 The deploy role may assume the CDK bootstrap roles ([Bootstrapping](https://docs.aws.amazon.com/cdk/v2/guide/bootstrapping.html)). The migrate role holds only the Data API, master secret, and SSM parameter permissions the migration needs. Both trust one GitHub Environment and nothing else; which branches may deploy to that environment is a rule on the environment in GitHub. Both come from `packages/infra/BootstrapIam.yaml`, applied once per account outside the CDK app (README, Setup).
