@@ -7,8 +7,8 @@ export interface InfraStackProps extends StackProps {
 }
 
 export class InfraStack extends Stack {
-  constructor(scope: Construct, id: string, props: InfraStackProps) {
-    super(scope, id, props);
+  constructor(scope: Construct, props: InfraStackProps) {
+    super(scope, "QuackInfraStack", props);
 
     new Vpc(this, "Vpc", {
       vpcName: props.vpcName,

@@ -6,7 +6,7 @@ const account = process.env.CDK_DEFAULT_ACCOUNT;
 if (!account) throw new Error("CDK_DEFAULT_ACCOUNT is not set; run with AWS credentials");
 
 const app = new App();
-new InfraStack(app, "quack-infra", {
+new InfraStack(app, {
   env: { account, region: config.primary.region },
   vpcName: config.primary.vpcName,
 });
