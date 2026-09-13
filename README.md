@@ -24,4 +24,25 @@ Once per AWS account, before the first workflow run.
 
 3. In the GitHub repository, create the `dev` environment with one variable, `AWS_DEPLOY_ROLE_ARN`, set to the `DeployRoleArn` output of the BootstrapIam stack. Under the environment's deployment branches rule, allow `main` only; the roles trust the environment, so this rule is what limits deploys to `main`.
 
+4. On the machine used for local development, install the Session Manager plugin for the AWS CLI. It opens the port-forwarding session to the bastion host that reaches the database ([Install the Session Manager plugin](https://docs.aws.amazon.com/systems-manager/latest/userguide/session-manager-working-with-install-plugin.html)). On Ubuntu and WSL:
+
+   ```
+   curl -o session-manager-plugin.deb https://s3.amazonaws.com/session-manager-downloads/plugin/latest/ubuntu_64bit/session-manager-plugin.deb
+   sudo dpkg -i session-manager-plugin.deb
+   session-manager-plugin --version
+   ```
+
+## Local database access
+
+The cluster sits in private subnets. A bastion host in the data stack forwards a local port to it through Session Manager. Run this and leave it open, then connect to `localhost:5432`.
+
+```
+aws ssm start-session --profile ryt.quack.admin --region us-east-1 \
+  --target i-03f0151c2c09e67cf \
+  --document-name AWS-StartPortForwardingSessionToRemoteHost \
+  --parameters host=quackdatastack-auroraclusterd4efe71c-w8f0swlz2sfh.cluster-cyv0k6sauhlc.us-east-1.rds.amazonaws.com,portNumber=5432,localPortNumber=5432
+```
+
+The bastion ID is the `BastionInstanceId` output of the data stack and the host is its `ClusterEndpoint` output; both change on a redeploy.
+
 This project was built with AI-assisted development.

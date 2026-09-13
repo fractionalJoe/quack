@@ -16,7 +16,6 @@ interface AuroraClusterProps {
 
 export class AuroraCluster extends Construct {
   private readonly cluster: DatabaseCluster;
-  private readonly clusterSecurityGroup: SecurityGroup;
 
   public get clusterArn(): string {
     return this.cluster.clusterArn;
@@ -29,9 +28,7 @@ export class AuroraCluster extends Construct {
   public get endpoint(): string {
     return this.cluster.clusterEndpoint.hostname;
   }
-  public get clusterSecurityGroupId(): string {
-    return this.clusterSecurityGroup.securityGroupId;
-  }
+  public readonly clusterSecurityGroup: SecurityGroup;
 
   constructor(scope: Construct, props: AuroraClusterProps) {
     super(scope, "Aurora");
