@@ -6,7 +6,7 @@ AWSTemplateFormatVersion: "2010-09-09"
 #     --stack-name BootstrapIam \
 #     --template-file packages/infra/BootstrapIam.yaml \
 #     --capabilities CAPABILITY_NAMED_IAM \
-#     --parameter-overrides GitHubRepo=<repo> GitHubEnvironment=<environment>
+#     --parameter-overrides GitHubRepo=<repo> GitHubRepoId=<repo_id> GitHubEnvironment=<environment>
 Description: >
   Account bootstrap IAM. Creates the GitHub OIDC identity provider and two
   GitHub Actions roles: a deploy role that may assume the CDK bootstrap roles,
@@ -18,9 +18,18 @@ Parameters:
     Type: String
     Description: GitHub organisation or user that owns the repository.
     Default: fractionalJoe
+  GitHubOwnerId:
+    Type: String
+    AllowedPattern: "[0-9]+"
+    Default: "1263246"
+    Description: Numeric ID of the owner. GitHub embeds it in the OIDC subject so a renamed or re-registered owner cannot inherit the trust.
   GitHubRepo:
     Type: String
     Description: Repository name without the organisation.
+  GitHubRepoId:
+    Type: String
+    AllowedPattern: "[0-9]+"
+    Description: Numeric ID of the repository, embedded in the OIDC subject for the same reason.
   GitHubEnvironment:
     Type: String
     AllowedPattern: "[a-z0-9_.-]+"
@@ -77,7 +86,7 @@ Resources:
             Condition:
               StringEquals:
                 token.actions.githubusercontent.com:aud: sts.amazonaws.com
-                token.actions.githubusercontent.com:sub: !Sub "repo:${GitHubOrg}/${GitHubRepo}:environment:${GitHubEnvironment}"
+                token.actions.githubusercontent.com:sub: !Sub "repo:${GitHubOrg}@${GitHubOwnerId}/${GitHubRepo}@${GitHubRepoId}:environment:${GitHubEnvironment}"
       ManagedPolicyArns:
         - !Ref CdkDeployPolicy
 
@@ -96,7 +105,7 @@ Resources:
             Condition:
               StringEquals:
                 token.actions.githubusercontent.com:aud: sts.amazonaws.com
-                token.actions.githubusercontent.com:sub: !Sub "repo:${GitHubOrg}/${GitHubRepo}:environment:${GitHubEnvironment}"
+                token.actions.githubusercontent.com:sub: !Sub "repo:${GitHubOrg}@${GitHubOwnerId}/${GitHubRepo}@${GitHubRepoId}:environment:${GitHubEnvironment}"
       Policies:
         - PolicyName: schema-migration
           PolicyDocument:
