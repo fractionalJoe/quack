@@ -1,0 +1,136 @@
+AWSTemplateFormatVersion: "2010-09-09"
+# Deploy once per account, before cdk bootstrap and the first workflow run:
+#   aws cloudformation deploy \
+#     --profile <aws_profile_name> \
+#     --region us-east-1 \
+#     --stack-name BootstrapIam \
+#     --template-file packages/infra/BootstrapIam.yaml \
+#     --capabilities CAPABILITY_NAMED_IAM \
+#     --parameter-overrides GitHubRepo=<repo>
+Description: >
+  Account bootstrap IAM. Creates the GitHub OIDC identity provider and two
+  GitHub Actions roles: a deploy role that may assume the CDK bootstrap roles,
+  and a migrate role that runs schema migrations through the RDS Data API.
+  Not part of the CDK app.
+
+Parameters:
+  GitHubOrg:
+    Type: String
+    Description: GitHub organisation or user that owns the repository.
+    Default: fractionalJoe
+  GitHubRepo:
+    Type: String
+    Description: Repository name without the organisation.
+  GitHubBranch:
+    Type: String
+    AllowedPattern: "[a-z0-9_.-]+"
+    Default: main
+    Description: The only branch the roles trust.
+  CdkQualifier:
+    Type: String
+    Default: hnb659fds
+    Description: CDK bootstrap qualifier. Change only if cdk bootstrap was run with --qualifier.
+
+Resources:
+  GitHubOidcProvider:
+    Type: AWS::IAM::OIDCProvider
+    Properties:
+      Url: https://token.actions.githubusercontent.com
+      ClientIdList:
+        - sts.amazonaws.com
+      # AWS validates GitHub's TLS chain directly; the resource schema still
+      # requires this field.
+      ThumbprintList:
+        - 6938fd4d98bab03faadb97b34396831e3780aea1
+        - 1c58a3a8518e8759bf075b76b750d4f2df264fcd
+
+  CdkDeployPolicy:
+    Type: AWS::IAM::ManagedPolicy
+    Properties:
+      ManagedPolicyName: !Sub "Gha${GitHubRepo}CdkDeploy"
+      # Description is immutable on a managed policy with a fixed name; editing
+      # it forces a replacement that collides with the existing policy.
+      Description: Lets the GitHub Actions deploy role assume the CDK bootstrap roles.
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Sid: AssumeCdkBootstrapRoles
+            Effect: Allow
+            Action: sts:AssumeRole
+            Resource:
+              - !Sub "arn:aws:iam::${AWS::AccountId}:role/cdk-${CdkQualifier}-deploy-role-${AWS::AccountId}-*"
+              - !Sub "arn:aws:iam::${AWS::AccountId}:role/cdk-${CdkQualifier}-file-publishing-role-${AWS::AccountId}-*"
+              - !Sub "arn:aws:iam::${AWS::AccountId}:role/cdk-${CdkQualifier}-image-publishing-role-${AWS::AccountId}-*"
+              - !Sub "arn:aws:iam::${AWS::AccountId}:role/cdk-${CdkQualifier}-lookup-role-${AWS::AccountId}-*"
+
+  GhaDeployRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: !Sub "Gha${GitHubRepo}Deploy"
+      Description: !Sub "GitHub Actions deploy role for ${GitHubOrg}/${GitHubRepo}"
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Federated: !Ref GitHubOidcProvider
+            Action: sts:AssumeRoleWithWebIdentity
+            Condition:
+              StringEquals:
+                token.actions.githubusercontent.com:aud: sts.amazonaws.com
+                token.actions.githubusercontent.com:sub: !Sub "repo:${GitHubOrg}/${GitHubRepo}:ref:refs/heads/${GitHubBranch}"
+      ManagedPolicyArns:
+        - !Ref CdkDeployPolicy
+
+  GhaMigrateRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: !Sub "Gha${GitHubRepo}Migrate"
+      Description: !Sub "GitHub Actions schema migration role for ${GitHubOrg}/${GitHubRepo}"
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Federated: !Ref GitHubOidcProvider
+            Action: sts:AssumeRoleWithWebIdentity
+            Condition:
+              StringEquals:
+                token.actions.githubusercontent.com:aud: sts.amazonaws.com
+                token.actions.githubusercontent.com:sub: !Sub "repo:${GitHubOrg}/${GitHubRepo}:ref:refs/heads/${GitHubBranch}"
+      Policies:
+        - PolicyName: schema-migration
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Sid: DataApi
+                Effect: Allow
+                Action:
+                  - rds-data:ExecuteStatement
+                  - rds-data:BatchExecuteStatement
+                  - rds-data:BeginTransaction
+                  - rds-data:CommitTransaction
+                  - rds-data:RollbackTransaction
+                Resource: !Sub "arn:aws:rds:${AWS::Region}:${AWS::AccountId}:cluster:*"
+              # RDS names the master secret it manages rds!cluster-<id>.
+              - Sid: ReadMasterSecret
+                Effect: Allow
+                Action: secretsmanager:GetSecretValue
+                Resource: !Sub "arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:rds!cluster-*"
+              - Sid: ReadDataParams
+                Effect: Allow
+                Action:
+                  - ssm:GetParameter
+                  - ssm:GetParameters
+                Resource: !Sub "arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:parameter/${GitHubRepo}/data/*"
+
+Outputs:
+  OidcProviderArn:
+    Description: GitHub OIDC identity provider ARN
+    Value: !Ref GitHubOidcProvider
+  DeployRoleArn:
+    Description: role-to-assume for the GitHub Actions deploy job
+    Value: !GetAtt GhaDeployRole.Arn
+  MigrateRoleArn:
+    Description: role-to-assume for the GitHub Actions migrate job
+    Value: !GetAtt GhaMigrateRole.Arn

@@ -4,19 +4,29 @@ Configuration, secrets, and ponds are in architecture.md.
 
 ## Deploy
 
-GitHub Actions deploys on every push to main. The workflow checks out the repository, installs the workspace, assumes the deploy role in the AWS account through GitHub's OpenID Connect provider ([Configuring OpenID Connect in AWS](https://docs.github.com/en/actions/security-for-github-actions/security-hardening-your-deployments/configuring-openid-connect-in-amazon-web-services)), and runs `cdk deploy --all` with concurrency. No long-lived AWS credential exists in GitHub. CDK builds each service's container image on the runner with Docker and pushes it to the bootstrap image repository ([Assets](https://docs.aws.amazon.com/cdk/v2/guide/assets.html)); the same run applies the schema migration and updates every changed stack.
+GitHub Actions deploys on every push to main. The workflow checks out the repository, installs the workspace, assumes the deploy role in the AWS account through GitHub's OpenID Connect provider ([Configuring OpenID Connect in AWS](https://docs.github.com/en/actions/security-for-github-actions/security-hardening-your-deployments/configuring-openid-connect-in-amazon-web-services)), and runs `cdk deploy` with concurrency. No long-lived AWS credential exists in GitHub. CDK builds each service's container image on the runner with Docker and pushes it to the bootstrap image repository ([Assets](https://docs.aws.amazon.com/cdk/v2/guide/assets.html)). The run is three jobs: deploy the network, data, fanout, cluster, and web stacks; apply the schema migration as the migrate role; deploy the service stacks.
 
 The deploy role trusts the repository's main branch only and may assume the CDK bootstrap roles ([Bootstrapping](https://docs.aws.amazon.com/cdk/v2/guide/bootstrapping.html)). It holds no other permissions.
 
 `cdk deploy` from a developer machine with the same command is the path for initial setup and for troubleshooting. Both paths run the same CDK app against the same account and region from the repository's configuration, so a deploy from either leaves the same stacks.
 
-An account bootstrap CloudFormation template in the repository creates the OpenID Connect provider, the deploy role, and its policies. It is applied once from the developer machine with that person's credentials in the environment step (PLAN.md Phase 3 Step 1), alongside the CDK bootstrap, before the first workflow run. It is not part of the CDK app.
+An account bootstrap CloudFormation template in the repository creates the OpenID Connect provider, the deploy role, and the migrate role. The migrate role trusts the same branch and holds only the Data API, master secret, and SSM parameter permissions the migration needs. It is applied once from the developer machine with that person's credentials in the environment step (PLAN.md Phase 3 Step 1), alongside the CDK bootstrap, before the first workflow run. It is not part of the CDK app.
+
+```
+aws cloudformation deploy \
+  --profile <aws_profile_name> \
+  --region us-east-1 \
+  --stack-name BootstrapIam \
+  --template-file packages/infra/BootstrapIam.yaml \
+  --capabilities CAPABILITY_NAMED_IAM \
+  --parameter-overrides GitHubRepo=quack
+```
 
 ## Schema migration
 
 The schema lives in the data stack's project as a Drizzle schema in TypeScript plus a migrations folder. `drizzle-kit generate` writes a migration for tables, indexes, and foreign keys from the schema. Roles, the is_member and is_owner functions, row-level security, policies, and grants are one custom SQL migration in the same folder, created with `drizzle-kit generate --custom`, since Drizzle Kit has no construct for functions or grants ([Drizzle RLS](https://orm.drizzle.team/docs/rls)). Policies stay out of the TypeScript schema so that the tables migration always sorts before the security migration.
 
-The deploy job runs `drizzle-kit migrate` after the data stack deploys and before the service stacks. It applies every migration not yet recorded in Drizzle's migrations table, in filename order ([Migrations with Drizzle Kit](https://orm.drizzle.team/docs/kit-overview)). It connects through the RDS Data API with Drizzle Kit's Data API driver ([drizzle.config.ts](https://orm.drizzle.team/docs/drizzle-config-file)), authenticated by the deploy role and the cluster's master secret, which RDS manages in Secrets Manager. The runner needs no VPC access. The data stack enables the Data API on the cluster and writes the cluster ARN and secret ARN to SSM parameters for the migrate step. Only the migration uses the Data API and the master secret; services connect with IAM authentication as their own roles (data-model.md, Roles and grants).
+The migrate job runs `drizzle-kit migrate` after the data stack deploys and before the service stacks. It applies every migration not yet recorded in Drizzle's migrations table, in filename order ([Migrations with Drizzle Kit](https://orm.drizzle.team/docs/kit-overview)). It connects through the RDS Data API with Drizzle Kit's Data API driver ([drizzle.config.ts](https://orm.drizzle.team/docs/drizzle-config-file)), authenticated by the migrate role and the cluster's master secret, which RDS manages in Secrets Manager. The runner needs no VPC access. The data stack enables the Data API on the cluster and writes the cluster ARN and secret ARN to SSM parameters under /quack/data/ for the migrate job. Only the migration uses the Data API and the master secret; services connect with IAM authentication as their own roles (data-model.md, Roles and grants).
 
 The Data API sends one statement per call, at most 64 KiB, and cancels a statement after 45 seconds ([ExecuteStatement](https://docs.aws.amazon.com/rdsdataservice/latest/APIReference/API_ExecuteStatement.html), [Timeouts](https://docs.aws.amazon.com/AmazonRDS/latest/AuroraUserGuide/data-api-timeouts.html)). Custom SQL files carry Drizzle's statement-breakpoint marker between statements. A paused Serverless v2 cluster rejects the first call while it resumes ([DatabaseResumingException](https://docs.aws.amazon.com/rdsdataservice/latest/APIReference/API_ExecuteStatement.html)), so the migrate step retries.
 
