@@ -58,7 +58,7 @@ Implement the design, deploying to the dev account as each step completes. Satur
 
 ### Steps
 
-1. [ ] Environment: AWS dev account credentials on this machine, region chosen, CDK bootstrapped, Google Cloud project with an OAuth web client ID, client ID stored where architecture.md says. Result: caller identity shows the dev account, CDKToolkit stack exists, the parameter reads back.
+1. [x] Environment: AWS dev account credentials on this machine, region chosen, account bootstrap IAM applied, CDK bootstrapped, Google Cloud project with an OAuth web client ID, client ID stored where architecture.md says. Result: caller identity shows the dev account, BootstrapIam and CDKToolkit stacks exist, the config file holds the client ID.
 2. [ ] Scaffold: workspace layout per architecture.md, TypeScript config, CDK app with empty stack(s), deployed. Result: stack(s) in CloudFormation; cdk diff is clean.
 3. [ ] Data layer: table(s) per data-model.md in CDK; data access module covering every access pattern. Result: a script exercises each access pattern against the deployed table.
 4. [ ] Sign-in: Google ID token verification, authorizer, user record upsert. Result: a request with a valid ID token succeeds; invalid and expired tokens get 401.

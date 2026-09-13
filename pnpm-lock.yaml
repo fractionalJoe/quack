@@ -166,9 +166,18 @@ importers:
 
   .:
     devDependencies:
+      aws-cdk:
+        specifier: ^2.1141.0
+        version: 2.1141.0
       typescript:
         specifier: ^7.0.2
         version: 7.0.2
+
+  packages/infra:
+    devDependencies:
+      cdk:
+        specifier: ^2.1141.0
+        version: 2.1141.0
 
 packages:
 
@@ -292,6 +301,16 @@ packages:
     cpu: [x64]
     os: [win32]
 
+  aws-cdk@2.1141.0:
+    resolution: {integrity: sha512-RIKueAoFNYUot/VmlUzPUbecxNCtLzJFqpy/O+vTpjrvDn4k2Uiu9Y/QlVlQzaSJw0qqNNY6ldusJVdkX8aBNA==}
+    engines: {node: '>= 18.0.0'}
+    hasBin: true
+
+  cdk@2.1141.0:
+    resolution: {integrity: sha512-BQsyP6nrQ5uSla0S1+4D/mzlvvAhw8llLDo18I0n1IvBznYir/8TzuJa3Va7FluvwZIJRTVqBHC9c9Puf59oYQ==}
+    engines: {node: '>= 18.0.0'}
+    hasBin: true
+
   typescript@7.0.2:
     resolution: {integrity: sha512-8FYau96o3NKOhbjKi/qNvG/W5jhzxkbdm5sj9AbZ/5T5sWqn3hJgLfGx27sRKZWTvyzCP8dLRBTf5tBTSRVUNA==}
     engines: {node: '>=16.20.0'}
@@ -358,6 +377,12 @@ snapshots:
 
   '@typescript/typescript-win32-x64@7.0.2':
     optional: true
+
+  aws-cdk@2.1141.0: {}
+
+  cdk@2.1141.0:
+    dependencies:
+      aws-cdk: 2.1141.0
 
   typescript@7.0.2:
     optionalDependencies:
