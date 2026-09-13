@@ -160,12 +160,15 @@ jobs:
           echo "AWS_RDS_ARN=$(aws ssm get-parameter --name /quack/data/cluster-arn --query Parameter.Value --output text)" >> "$GITHUB_ENV"
           echo "AWS_RDS_SECRET_ARN=$(aws ssm get-parameter --name /quack/data/secret-arn --query Parameter.Value --output text)" >> "$GITHUB_ENV"
 
-      - name: Migrate
+      - name: Wait for the cluster
         # A paused cluster rejects the first call while it resumes (DatabaseResumingException).
         run: |
           for attempt in {1..12}; do
-            pnpm db migrate && exit 0
+            aws rds-data execute-statement --resource-arn "$AWS_RDS_ARN" --secret-arn "$AWS_RDS_SECRET_ARN" --database quack --sql "select 1" && exit 0
             echo "attempt $attempt failed, retrying in 15s"
             sleep 15
           done
           exit 1
+
+      - name: Migrate
+        run: pnpm db migrate
