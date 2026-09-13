@@ -4,51 +4,15 @@ Quack is a minimal Slack-like chat service on AWS. Channels are called flocks.
 
 Timebox: Saturday 2026-09-12 and Sunday 2026-09-13. Phase budgets are working hours. When a step threatens its budget, the cut is named and decided before continuing.
 
+Discovery, Design, and the Build environment step are complete; [PLAN.original.md](PLAN.original.md) records them. This plan carries the remaining work as slices: each slice builds one part of the system and deploys it through the GitHub Actions workflow before the next begins.
+
 Each step is one sitting and ends with the result named on it. Steps may be added or removed. Order within a phase does not change. A step is checked when its result is verified.
 
 The design playbook workbook is the discovery tool: [Design Playbook - Quack.xlsx](<Design Playbook - Quack.xlsx>). The docs carry what the design needs from it.
 
-## Phase 1: Discovery
-
-Establish requirements, scope, and scale by completing the design playbook sheets. Saturday morning, 2 hours. Actual: 5 hours 19 minutes.
-
-### Exit Criteria
-
-- [x] Design Brief, Scoping Questions, Requirements, and Scale and Estimates sheets are complete: every row or question has an answer or an explicit N/A with a reason.
-- [x] Scale and Estimates shows no "Missing Info" in the Calculated block and every input names its source or assumption.
-- [x] Every out of scope item and every external dependency is listed with a reason. Each becomes an ADR in Design.
-
-### Steps
-
-1. [x] Design Brief sheet: problem statement, business value, personas, workflows, dependencies, success criteria, constraints, assumptions, out of scope, risks. Single-person sections (stakeholders, responsible parties, budget) filled as such. Result: no empty section.
-2. [x] Scoping Questions sheet: answer every question. Result: no empty Answer cell.
-3. [x] Requirements sheet: functional, non-functional, data entities and access patterns, future considerations. Result: every product requirement is an FR with a priority; every entity has at least one access pattern with a frequency; multiple ponds is a future consideration.
-4. [x] Scale and Estimates sheet: fill every input with a source or stated assumption. Result: Calculated block fully populated.
-
-## Phase 2: Design
-
-Establish the technical approach and record every decision before any code exists. Saturday late morning, 3 hours. Actual: 7 hours 35 minutes. At each decision point the options are presented, Joe decides, and an ADR records it.
-
-### Exit Criteria
-
-- [x] docs/design holds architecture, data model, request flows, and operational design (including where the design stops scaling and what changes), each complete for the MVP.
-- [x] Every scope cut and every dependency has an ADR in docs/adr in the agreed format.
-- [x] Decision Log sheet lists every expensive-to-reverse decision with a link to its ADR.
-- [x] No application code exists. Every numeric claim in docs carries a source link.
-- [x] Design docs are pushed to the GitHub remote.
-
-### Steps
-
-1. [x] Repo skeleton: git init, .gitignore, README stub with the AI-assisted development sentence, docs/README.md, docs/design/, docs/adr/ with the ADR template, GitHub remote, first push. Result: the remote shows the skeleton.
-2. [x] Architecture: decide compute, HTTP API, real-time transport, web client hosting, Google ID token verification, WebSocket authentication, and stack layout. Result: docs/design/architecture.md with a component diagram and the pond note; one ADR per decision.
-3. [x] Data model: entities and access patterns from the Requirements sheet, table design, keys, pond key. Result: docs/design/data-model.md; ADR for the data store.
-4. [x] Request flows: sign-in, create flock, list flocks, add member, delete flock, send message with fan-out, history load, connect and disconnect, each with its authorization check. Result: docs/design/flows/, one file per flow with a sequence diagram.
-5. [x] Operations and scaling: deploy method, configuration and secrets, logging, cost from the Scale sheet, scaling limits with sourced quotas and what changes, multiple ponds as the named future enhancement. Result: docs/design/operational-design.md; ADRs for each dependency.
-6. [x] Decision Log and ADR sweep: fill the Decision Log sheet; confirm every out of scope item (presence, typing indicators, read state, search, file sharing, notifications, threads, message editing, hosted user pools) and every dependency has an ADR. Result: docs/README.md links everything; pushed.
-
 ## Phase 3: Build
 
-Implement the design, deploying to the dev account as each step completes. Saturday afternoon and Sunday, 12 hours.
+Implement the design as deployed slices. Sunday, 12 hours.
 
 ### Exit Criteria
 
@@ -58,19 +22,19 @@ Implement the design, deploying to the dev account as each step completes. Satur
 
 ### Steps
 
-1. [x] Environment: AWS dev account credentials on this machine, region chosen, account bootstrap IAM applied, CDK bootstrapped, Google Cloud project with an OAuth web client ID, client ID stored where architecture.md says. Result: caller identity shows the dev account, BootstrapIam and CDKToolkit stacks exist, the config file holds the client ID.
-2. [ ] Scaffold: workspace layout per architecture.md, TypeScript config, CDK app with empty stack(s), deployed. Result: stack(s) in CloudFormation; cdk diff is clean.
-3. [ ] Data layer: table(s) per data-model.md in CDK; data access module covering every access pattern. Result: a script exercises each access pattern against the deployed table.
-4. [ ] Sign-in: Google ID token verification, authorizer, user record upsert. Result: a request with a valid ID token succeeds; invalid and expired tokens get 401.
-5. [ ] Flocks: create, list, add member, delete. Result: curl walkthrough creates, lists, adds a member, and deletes; only the creator can delete; rules from flows/README.md hold.
-6. [ ] Messages: send and history. Result: a sent message persists; history returns recent messages in order; non-member send and read are rejected.
-7. [ ] Real-time: WebSocket connect with authentication, disconnect cleanup, fan-out on send. Result: two wscat sessions; a message from one arrives at the other; a non-member session receives nothing.
+1. [ ] Infra: root TypeScript config, config.json read by CDK, network package and stack (VPC, public and private subnets, NAT gateway), GitHub Actions workflow assuming the deploy role through OIDC, first deploy through the workflow. Each later slice adds its own package. Result: the network stack is in CloudFormation, deployed by the workflow; cdk diff is clean.
+2. [ ] Data: data package and stack (Aurora Serverless v2 with the Data API, subnet group, security group, SSM parameters under /quack/data/), Drizzle schema, security SQL migration (roles, is_member and is_owner, policies, grants), migrate job assuming the migrate role, shared package with data access (pool, IAM token, transaction settings), access pattern script. Result: the migrate job passes in the workflow; the script exercises each access pattern against the deployed cluster.
+3. [ ] Cluster: cluster stack (ECS cluster, load balancer, HTTPS listener, certificate), fanout stack (Valkey node, subnet group, security group), Cloudflare validation and api CNAME records. Result: https://api.quack.ryt.dev answers with the listener's default response over a valid certificate; both stacks are in CloudFormation.
+4. [ ] Ducks: shared token module, fastify verify-and-resolve hook, request log line, shared service construct (task definition, service, target group, listener rule, log group, database role and grants), ducks service (PUT and GET /ducks/me, GET /ducks) and stack. Result: a request with a valid ID token upserts and returns the duck; invalid and expired tokens get 401.
+5. [ ] Flocks: flocks service and stack: create, list, add member, delete. Result: curl walkthrough creates, lists, adds a member, and deletes; only the owner can delete; rules from flows/README.md hold.
+6. [ ] Messages: messages service and stack: send with publish to the flock topic, history. Result: a sent message persists; history returns the latest 50 newest first; non-member send and read get 403.
+7. [ ] Real-time: tickets route on ducks, websocket service (redeem ticket, subscribe per flock, push, ping and pong, close at token expiry, unsubscribe on close), websocket stack, /ws listener rule. Result: two wscat sessions; a message from one arrives at the other; a non-member session receives nothing.
 8. [ ] Load test: k6 script against the HTTP API and the live path with a captured ID token. Result: latency, freshness, and error-rate figures recorded against SC-01 to SC-07; autoscaling observed.
-9. [ ] Web client: sign in, list, create, and delete flocks, add members, message history, live updates. Result: two browser sessions exchange messages.
-10. [ ] Hardening: input validation, error responses, structured logs, authorization negative-path checklist. Result: checklist passes.
+9. [ ] Web client: React app with Google sign-in, flock list, create and delete, add member, history, live updates, token refresh; web stack (S3 bucket, CloudFront distribution, certificate), Cloudflare records. Result: two browser sessions at https://quack.ryt.dev exchange messages.
+10. [ ] Hardening: input validation, error responses, authorization negative-path checklist. Result: checklist passes.
 11. [ ] Docs alignment: README walkthrough, docs updated to the built system, ADRs for any deviation from the design. Result: docs describe what runs.
 
-Cut candidates if the budget is threatened (decided at the time, not now): web client scope beyond the required flows, hardening beyond authorization checks, structured logging.
+Cut candidates if the budget is threatened (decided at the time, not now): web client scope beyond the required flows, hardening beyond authorization checks, the request log line.
 
 ## Phase 4: Delivery
 
@@ -88,26 +52,26 @@ Prove the MVP deploys to the dev account from the repo alone and publish the rep
 2. [ ] Smoke checklist on the fresh deployment: sign in, create and list a flock, add a member, send, receive live in a second session, history on open, delete a flock, load test rerun. Result: every item passes, recorded here.
 3. [ ] Publish: remove plan-prompt.md; grep for em dashes and for learning, practice, and interview references; confirm numeric claims are sourced and the AI disclosure sentence is present; decide visibility; push. Result: repo public at its final URL.
 
-## Revised estimation
+## Estimation
 
-**2029-09-13 19:45** Bottom-up estimate of the remaining work, made after Phase 2 closed at 7 hours 35 minutes against 3. One sitting per step; the first deploy of each new kind of thing (Actions OIDC, IAM database authentication from a task, WebSockets through the load balancer) is where a step goes over.
+**2026-09-13** Bottom-up estimate of the slices above. One sitting per step; the first deploy of each new kind of thing (the Actions workflow, the migrate job, IAM database authentication from a task, WebSockets through the load balancer) is where a step goes over.
 
-| Step                | Work                                                                                                                                                                | Hours |
-| ------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----- |
-| 3.1 Environment     | Account bootstrap template, OIDC provider and deploy role, CDK bootstrap, SSM parameter                                                                             | 1     |
-| 3.2 Scaffold        | Workspace, eight CDK projects, Actions workflow, first deploy through Actions                                                                                       | 2     |
-| 3.3 Data layer      | Network and data stacks, Aurora with Data API and IAM auth, Drizzle schema, security SQL, migrate step, shared data access with RLS settings, access pattern script | 4     |
-| 3.4 Sign-in         | Cluster stack with ALB and certificate, Cloudflare records, token module, fastify hook, ducks service and stack, IAM DB auth from a task                            | 3     |
-| 3.5 Flocks          | Service, stack, curl walkthrough                                                                                                                                    | 1.5   |
-| 3.6 Messages        | Service, stack, fanout stack, publish                                                                                                                               | 1.5   |
-| 3.7 Real-time       | Ticket routes, websocket service, subscriptions, close at expiry, ALB path, stack, wscat test                                                                       | 3     |
-| 3.8 Load test       | k6 script for HTTP and sockets, run, record against SC-01 to SC-07                                                                                                  | 2     |
-| 3.9 Web client      | React app, Google sign-in, every flow, web stack, certificate                                                                                                       | 4     |
-| 3.10 Hardening      | Validation, error responses, log lines, negative-path checklist                                                                                                     | 1.5   |
-| 3.11 Docs alignment | README walkthrough, doc updates, deviation ADRs                                                                                                                     | 1.5   |
-| 4.1 Clean deploy    | Destroy, redeploy from the README, fix what it misses                                                                                                               | 1.5   |
-| 4.2 Smoke checklist | Every item plus the load test rerun                                                                                                                                 | 1     |
-| 4.3 Publish         | Greps, checks, visibility                                                                                                                                           | 0.5   |
-| Total               |                                                                                                                                                                     | 28    |
+| Step                | Work                                                                                                                                                | Hours |
+| ------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------- | ----- |
+| 3.1 Infra           | Root TypeScript config, config reader, network package and stack, Actions workflow with OIDC, first deploy through the workflow                     | 2     |
+| 3.2 Data            | Data package and stack with Data API and SSM parameters, Drizzle schema, security SQL, migrate job, shared package with data access, RLS settings and IAM auth, access pattern script | 4 |
+| 3.3 Cluster         | Cluster stack with ALB and certificate, fanout stack, Cloudflare records                                                                            | 2     |
+| 3.4 Ducks           | Token module, fastify hook, log line, service construct, ducks service and stack, IAM database authentication from a task                          | 3     |
+| 3.5 Flocks          | Service, stack, curl walkthrough                                                                                                                    | 1.5   |
+| 3.6 Messages        | Service, stack, publish                                                                                                                             | 1.5   |
+| 3.7 Real-time       | Ticket route, websocket service, subscriptions, close at expiry, /ws rule, stack, wscat test                                                        | 3     |
+| 3.8 Load test       | k6 script for HTTP and sockets, run, record against SC-01 to SC-07                                                                                  | 2     |
+| 3.9 Web client      | React app, Google sign-in, every flow, web stack, certificate, Cloudflare records                                                                   | 4     |
+| 3.10 Hardening      | Validation, error responses, negative-path checklist                                                                                                | 1     |
+| 3.11 Docs alignment | README walkthrough, doc updates, deviation ADRs                                                                                                     | 1.5   |
+| 4.1 Clean deploy    | Destroy, redeploy from the README, fix what it misses                                                                                               | 1.5   |
+| 4.2 Smoke checklist | Every item plus the load test rerun                                                                                                                 | 1     |
+| 4.3 Publish         | Greps, checks, visibility                                                                                                                           | 0.5   |
+| Total               |                                                                                                                                                     | 28.5  |
 
 Each step carries about plus or minus 30 percent.
