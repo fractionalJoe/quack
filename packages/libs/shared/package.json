@@ -10,5 +10,8 @@
     "build": "tsc",
     "typecheck": "tsc --noEmit",
     "test:unit": "tsx --test src/**/*.test.ts"
+  },
+  "dependencies": {
+    "jose": "^6.2.12"
   }
 }
