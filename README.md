@@ -59,9 +59,16 @@ Once per AWS account, before the first workflow run.
    session-manager-plugin --version
    ```
 
+5. On the same machine, resolve the cluster hostname to the tunnel. IAM tokens and the TLS certificate are bound to the cluster hostname, so local connections use it too. On WSL the entry goes in the Windows hosts file, which WSL copies into `/etc/hosts` at each start. In PowerShell as administrator, then reopen the terminal. The hostname is the `ClusterEndpoint` output of the data stack and changes on a redeploy.
+
+   ```
+   Add-Content -Path "$env:SystemRoot\System32\drivers\etc\hosts" -Value "127.0.0.1 quackdatastack-auroraclusterd4efe71c-w8f0swlz2sfh.cluster-cyv0k6sauhlc.us-east-1.rds.amazonaws.com"
+   wsl --shutdown
+   ```
+
 ## Local database access
 
-The cluster sits in private subnets. A bastion host in the data stack forwards a local port to it through Session Manager. Run this and leave it open, then connect to `localhost:5432`.
+The cluster sits in private subnets. A bastion host in the data stack forwards a local port to it through Session Manager. Run this and leave it open, then connect to the cluster hostname on port 5432; the hosts entry from Setup resolves it to the tunnel.
 
 ```
 aws ssm start-session --profile ryt.quack.admin --region us-east-1 \
