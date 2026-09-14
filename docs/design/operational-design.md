@@ -19,7 +19,6 @@ flowchart LR
     subgraph s2[Stage 2]
         data
         compute
-        fanout
     end
     subgraph s3[Stage 3]
         migrate
@@ -30,10 +29,10 @@ flowchart LR
         messages
         websocket
     end
-    infra --> data & compute & fanout
+    infra --> data & compute
     data --> migrate
     migrate ~~~ ducks & flocks & messages & websocket
-    migrate & compute & fanout --> s4
+    migrate & compute --> s4
 ```
 
 The deploy role may assume the CDK bootstrap roles ([Bootstrapping](https://docs.aws.amazon.com/cdk/v2/guide/bootstrapping.html)). The migrate role holds only the Data API, master secret, and SSM parameter permissions the migration needs. Both trust one GitHub Environment and nothing else; which branches may deploy to that environment is a rule on the environment in GitHub. Both come from `packages/infra/BootstrapIam.yaml`, applied once per account outside the CDK app (README, Setup).
@@ -52,14 +51,18 @@ The deploy role may assume the CDK bootstrap roles ([Bootstrapping](https://docs
 
 The data stack publishes these SSM parameters:
 
-| Parameter                     | Value                     | Reader         |
-| ----------------------------- | ------------------------- | -------------- |
-| /quack/data/cluster-arn       | cluster ARN               | migrate job    |
-| /quack/data/secret-arn        | master secret ARN         | migrate job    |
-| /quack/data/endpoint          | writer endpoint hostname  | service stacks |
-| /quack/data/security-group-id | cluster security group ID | service stacks |
+| Parameter                            | Value                     | Reader         |
+| ------------------------------------ | ------------------------- | -------------- |
+| /quack/data/cluster-arn              | cluster ARN               | migrate job    |
+| /quack/data/secret-arn               | master secret ARN         | migrate job    |
+| /quack/data/endpoint                 | writer endpoint hostname  | service stacks |
+| /quack/data/security-group-id        | cluster security group ID | service stacks |
+| /quack/data/valkey-endpoint          | Valkey primary endpoint   | service stacks |
+| /quack/data/valkey-security-group-id | Valkey security group ID  | service stacks |
 
 A bastion host in the same stack gives a developer machine a path to the cluster through Session Manager port forwarding (README, Local database access).
+
+The fan-out node is in the same stack: one cache.t4g.micro Valkey node in the private subnets, TLS in transit, reached on 6379 from the services' security groups.
 
 ## Schema migration
 

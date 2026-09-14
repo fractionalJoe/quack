@@ -43,16 +43,16 @@ flowchart LR
 | ------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------- |
 | Cloudflare DNS            | Holds the zone for ryt.dev. DNS-only CNAME records point quack.ryt.dev at CloudFront and api.quack.ryt.dev at the load balancer, plus the CNAMEs that validate the certificates. Records are entered by hand.           | none, outside AWS |
 | Web client                | Static files on S3, served by CloudFront at quack.ryt.dev                                                                                                                                                               | web               |
-| Application Load Balancer | HTTPS listener on api.quack.ryt.dev; path rules to services; WebSocket upgrades pass through                                                                                                                            | cluster           |
+| Application Load Balancer | HTTPS listener on api.quack.ryt.dev; path rules to services; WebSocket upgrades pass through                                                                                                                            | compute           |
 | `ducks` service           | ECS Fargate service; sign-in, me, tickets, duck list                                                                                                                                                                    | ducks             |
 | `flocks` service          | ECS Fargate service; flocks and memberships                                                                                                                                                                             | flocks            |
 | `messages` service        | ECS Fargate service; send and history                                                                                                                                                                                   | messages          |
 | `websocket` service       | ECS Fargate service; socket sessions and live delivery                                                                                                                                                                  | websocket         |
 | Aurora PostgreSQL         | Serverless v2 cluster, one database, one table per entity, every table carrying pond_id. Each domain owns its tables and is their only writer; row-level security enforces pond and membership on every query (ADR-009) | data              |
-| Message fan-out           | ElastiCache Valkey node; pub/sub topics between tasks, and the ticket handoff                                                                                                                                           | fanout            |
+| Message fan-out           | ElastiCache Valkey node; pub/sub topics between tasks, and the ticket handoff                                                                                                                                           | data              |
 | Bastion host              | EC2 instance in a protected subnet with no inbound rules, reached through Session Manager; forwards a developer's local port to the data store                                                                          | data              |
 | Network                   | VPC, public subnets for the load balancer, protected subnets for tasks, private subnets with no route out for the data store and the fan-out node                                                                       | infra             |
-| Certificates              | ACM in us-east-1; one for quack.ryt.dev on CloudFront, one for api.quack.ryt.dev on the load balancer; validated by CNAME in Cloudflare                                                                                 | web, cluster      |
+| Certificates              | ACM in us-east-1; one for quack.ryt.dev on CloudFront, one for api.quack.ryt.dev on the load balancer; validated by CNAME in Cloudflare                                                                                 | web, compute      |
 
 ## Request paths
 
@@ -98,13 +98,12 @@ A pond is a tenant. The MVP serves one pond with a fixed pond ID. Every record c
 
 One repository. Each row is a CDK stack in its own project; independent stacks deploy in parallel.
 
-| Stack                              | Contents                                                                                                   | Depends on            |
-| ---------------------------------- | ---------------------------------------------------------------------------------------------------------- | --------------------- |
-| infra                              | VPC, subnets, NAT gateway for image pulls and Google key fetches; shared parameters and roles              | none                  |
-| data                               | Aurora cluster, subnet group, security group, SSM parameters, bastion host                                 | infra                 |
-| fanout                             | ElastiCache Valkey node, subnet group, security group                                                      | infra                 |
-| cluster                            | ECS cluster, load balancer, HTTPS listener, certificate                                                    | infra                 |
-| ducks, flocks, messages, websocket | Task definition, service, target group, listener rule, scaling policy, log group, database role and grants | cluster, data, fanout |
-| web                                | S3 bucket, CloudFront distribution, certificate                                                            | none                  |
+| Stack                              | Contents                                                                                                   | Depends on    |
+| ---------------------------------- | ---------------------------------------------------------------------------------------------------------- | ------------- |
+| infra                              | VPC, subnets, NAT gateway for image pulls and Google key fetches; shared parameters and roles              | none          |
+| data                               | Aurora cluster and Valkey node, each with a subnet group and security group; SSM parameters; bastion host  | infra         |
+| compute                            | ECS cluster, load balancer, HTTPS listener, certificate, SSM parameters                                    | infra         |
+| ducks, flocks, messages, websocket | Task definition, service, target group, listener rule, scaling policy, log group, database role and grants | compute, data |
+| web                                | S3 bucket, CloudFront distribution, certificate                                                            | none          |
 
 Shared code lives in workspace libraries under `packages/libs`: `shared` holds configuration and is read by every package; `cdk` holds the stack base class; `db` holds the schema, migrations, and data access and is a dependency of the services only.
