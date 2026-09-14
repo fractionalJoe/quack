@@ -41,7 +41,7 @@ export class AuroraCluster extends Construct {
 
     this.cluster = new DatabaseCluster(this, "Cluster", {
       engine: DatabaseClusterEngine.auroraPostgres({
-        version: AuroraPostgresEngineVersion.VER_17_9,
+        version: AuroraPostgresEngineVersion.of("18.3", "18"),
       }),
       vpc: props.vpc,
       securityGroups: [this.clusterSecurityGroup],
