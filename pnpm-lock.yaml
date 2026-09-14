@@ -309,6 +309,24 @@ importers:
         specifier: ^6.2.12
         version: 6.2.12
 
+  packages/services/ducks:
+    dependencies:
+      '@quack/cdk':
+        specifier: workspace:*
+        version: link:../../libs/cdk
+      '@quack/db':
+        specifier: workspace:*
+        version: link:../../libs/db
+      '@quack/shared':
+        specifier: workspace:*
+        version: link:../../libs/shared
+      aws-cdk-lib:
+        specifier: ^2.269.0
+        version: 2.269.0(constructs@10.8.1)
+      constructs:
+        specifier: ^10.8.1
+        version: 10.8.1
+
 packages:
 
   '@aws-cdk/asset-awscli-v1@2.2.292':

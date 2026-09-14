@@ -1,0 +1,20 @@
+{
+  "name": "@quack/ducks",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "cdk": "cdk",
+    "typecheck": "tsc --noEmit",
+    "diff": "cdk diff QuackDucksServiceStack --profile ryt.quack.admin",
+    "deploy": "cdk deploy QuackDucksServiceStack --profile ryt.quack.admin",
+    "synth": "cdk synth QuackDucksServiceStack --profile ryt.quack.admin"
+  },
+  "dependencies": {
+    "@quack/db": "workspace:*",
+    "@quack/cdk": "workspace:*",
+    "@quack/shared": "workspace:*",
+    "aws-cdk-lib": "^2.269.0",
+    "constructs": "^10.8.1"
+  }
+}

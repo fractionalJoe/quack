@@ -6,6 +6,7 @@
     "compute": "pnpm --filter @quack/compute",
     "data": "pnpm --filter @quack/data",
     "db": "pnpm --filter @quack/db",
+    "ducks": "pnpm --filter @quack/ducks",
     "infra": "pnpm --filter @quack/infra",
     "shared": "pnpm --filter @quack/shared",
     "build": "pnpm -r build",
