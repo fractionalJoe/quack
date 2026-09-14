@@ -1,6 +1,7 @@
 import { type StackProps } from "aws-cdk-lib";
 import type { Construct } from "constructs";
 import { QuackStack } from "@quack/cdk";
+import { parameters } from "@quack/shared";
 import { Vpc } from "aws-cdk-lib/aws-ec2";
 import { Cluster } from "aws-cdk-lib/aws-ecs";
 import { Certificate, CertificateValidation } from "aws-cdk-lib/aws-certificatemanager";
@@ -31,17 +32,17 @@ export class ComputeStack extends QuackStack {
       certificate,
     });
 
-    this.addStackOutput("ClusterName", cluster.clusterName, "/quack/compute/cluster-name");
-    this.addStackOutput("ListenerArn", loadBalancer.listenerArn, "/quack/compute/listener-arn");
+    this.addStackOutput("ClusterName", cluster.clusterName, parameters.compute.clusterName);
+    this.addStackOutput("ListenerArn", loadBalancer.listenerArn, parameters.compute.listenerArn);
     this.addStackOutput(
       "AlbSecurityGroupId",
       loadBalancer.securityGroup.securityGroupId,
-      "/quack/compute/alb-security-group-id",
+      parameters.compute.albSecurityGroupId,
     );
     this.addStackOutput(
       "AlbDnsName",
       loadBalancer.loadBalancerDnsName,
-      "/quack/compute/alb-dns-name",
+      parameters.compute.albDnsName,
     );
   }
 }

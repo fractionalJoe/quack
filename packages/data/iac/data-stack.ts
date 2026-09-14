@@ -4,6 +4,7 @@ import { AuroraCluster } from "./lib/aurora-cluster.ts";
 import { Port, Vpc } from "aws-cdk-lib/aws-ec2";
 import { StringParameter } from "aws-cdk-lib/aws-ssm";
 import { QuackStack } from "@quack/cdk";
+import { parameters } from "@quack/shared";
 import { BastionHost } from "./lib/bastion-host.ts";
 import { ValkeyNode } from "./lib/valkey-node.ts";
 
@@ -40,25 +41,25 @@ export class DataStack extends QuackStack {
 
     const valkey = new ValkeyNode(this, { vpc });
 
-    this.addStackOutput("ClusterArn", cluster.clusterArn, "/quack/data/cluster-arn");
-    this.addStackOutput("ClusterSecretArn", cluster.secretArn, "/quack/data/secret-arn");
+    this.addStackOutput("ClusterArn", cluster.clusterArn, parameters.data.clusterArn);
+    this.addStackOutput("ClusterSecretArn", cluster.secretArn, parameters.data.secretArn);
     this.addStackOutput(
       "ClusterResourceId",
       cluster.resourceIdentifier,
-      "/quack/data/cluster-resource-id",
+      parameters.data.clusterResourceId,
     );
-    this.addStackOutput("ClusterEndpoint", cluster.endpoint, "/quack/data/endpoint");
+    this.addStackOutput("ClusterEndpoint", cluster.endpoint, parameters.data.endpoint);
     this.addStackOutput(
       "ClusterSecurityGroupId",
       cluster.clusterSecurityGroup.securityGroupId,
-      "/quack/data/security-group-id",
+      parameters.data.securityGroupId,
     );
     this.addStackOutput("BastionSecurityGroupId", bastion.securityGroup.securityGroupId);
-    this.addStackOutput("ValkeyEndpoint", valkey.endpoint, "/quack/data/valkey-endpoint");
+    this.addStackOutput("ValkeyEndpoint", valkey.endpoint, parameters.data.valkeyEndpoint);
     this.addStackOutput(
       "ValkeySecurityGroupId",
       valkey.securityGroup.securityGroupId,
-      "/quack/data/valkey-security-group-id",
+      parameters.data.valkeySecurityGroupId,
     );
   }
 }
