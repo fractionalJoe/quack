@@ -28,6 +28,9 @@ export class AuroraCluster extends Construct {
   public get endpoint(): string {
     return this.cluster.clusterEndpoint.hostname;
   }
+  public get resourceIdentifier() {
+    return this.cluster.clusterResourceIdentifier;
+  }
   public readonly clusterSecurityGroup: SecurityGroup;
 
   constructor(scope: Construct, props: AuroraClusterProps) {

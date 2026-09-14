@@ -42,6 +42,11 @@ export class DataStack extends QuackStack {
 
     this.addStackOutput("ClusterArn", cluster.clusterArn, "/quack/data/cluster-arn");
     this.addStackOutput("ClusterSecretArn", cluster.secretArn, "/quack/data/secret-arn");
+    this.addStackOutput(
+      "ClusterResourceId",
+      cluster.resourceIdentifier,
+      "/quack/data/cluster-resource-id",
+    );
     this.addStackOutput("ClusterEndpoint", cluster.endpoint, "/quack/data/endpoint");
     this.addStackOutput(
       "ClusterSecurityGroupId",
