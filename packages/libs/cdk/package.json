@@ -11,7 +11,11 @@
     "typecheck": "tsc --noEmit",
     "test:unit": "tsx --test src/**/*.test.ts"
   },
-  "dependencies": {
+  "devDependencies": {
+    "aws-cdk-lib": "^2.269.0",
+    "constructs": "^10.8.1"
+  },
+  "peerDependencies": {
     "aws-cdk-lib": "^2.269.0",
     "constructs": "^10.8.1"
   }
