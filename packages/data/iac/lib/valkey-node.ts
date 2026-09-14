@@ -34,6 +34,7 @@ export class ValkeyNode extends Construct {
       cacheNodeType: "cache.t4g.micro",
       numCacheClusters: 1,
       cacheSubnetGroupName: subnetGroup.ref,
+      automaticFailoverEnabled: false,
       securityGroupIds: [this.securityGroup.securityGroupId],
       transitEncryptionEnabled: true,
       atRestEncryptionEnabled: true,
