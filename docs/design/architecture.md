@@ -73,7 +73,7 @@ WebSocket: the browser calls the ducks service's tickets route with its bearer t
 
 ## Configuration
 
-Deploy-time configuration lives in `config.json` at the repository root: the web hostname, the API hostname, the Google OAuth client ID, and the region. Every package reads it through the shared package. Identifiers a stack creates and another stack needs, such as the VPC, the cluster, and the listener, are shared case by case: the producing stack writes them to SSM parameters, or the consuming stack looks them up by name or tag. CloudFormation exports are not used. Services receive their values as environment variables set in their task definitions.
+Deploy-time configuration lives in `config.json` in the shared package: the web hostname, the API hostname, the Google OAuth client ID, and the region. Every package reads it through the shared package. Identifiers a stack creates and another stack needs, such as the VPC, the cluster, and the listener, are shared case by case: the producing stack writes them to SSM parameters, or the consuming stack looks them up by name or tag. CloudFormation exports are not used. Services receive their values as environment variables set in their task definitions.
 
 Runtime parameters, values that change without a redeploy, live in SSM Parameter Store and are read by the service at start. The MVP has none. Application secrets, when they exist, go in SSM as SecureString parameters and are read the same way. The MVP has none: the OAuth client ID is public by design, and database access uses IAM authentication.
 

@@ -10,6 +10,7 @@
     "infra": "pnpm --filter @quack/infra",
     "shared": "pnpm --filter @quack/shared",
     "build": "pnpm -r build",
+    "docker:build:ducks": "docker build -f packages/services/ducks/Dockerfile -t quack-ducks .",
     "typecheck": "pnpm -r typecheck",
     "test:unit": "pnpm -r test:unit",
     "format": "prettier --write ."

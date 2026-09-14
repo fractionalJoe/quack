@@ -25,7 +25,7 @@ runs:
     - name: Read region
       id: config
       shell: bash
-      run: echo "region=$(jq -r .primary.region config.json)" >> "$GITHUB_OUTPUT"
+      run: echo "region=$(jq -r .primary.region packages/libs/shared/config.json)" >> "$GITHUB_OUTPUT"
 
     - name: Configure AWS credentials
       if: inputs.role-to-assume != ''
