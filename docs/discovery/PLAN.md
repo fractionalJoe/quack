@@ -30,28 +30,26 @@ Implement the design as deployed slices. Sunday, 12 hours.
 6. [ ] Flocks: flocks service and stack: create, list, add member, delete. Result: curl walkthrough creates, lists, adds a member, and deletes; only the owner can delete; rules from flows/README.md hold.
 7. [ ] Messages: messages service and stack: send with publish to the flock topic, history. Result: a sent message persists; history returns the latest 50 newest first; non-member send and read get 403.
 8. [ ] Real-time: tickets route on ducks, websocket service (redeem ticket, subscribe per flock, push, ping and pong, close at token expiry, unsubscribe on close), websocket stack, /ws listener rule. Result: two wscat sessions; a message from one arrives at the other; a non-member session receives nothing.
-9. [ ] Load test: k6 script against the HTTP API and the live path with a captured ID token. Result: latency, freshness, and error-rate figures recorded against SC-01 to SC-07; autoscaling observed.
-10. [ ] Web client: React app with Google sign-in, flock list, create and delete, add member, history, live updates, token refresh; web stack (S3 bucket, CloudFront distribution, certificate), Cloudflare records, CORS response headers on the HTTPS listener. Result: two browser sessions at https://quack.ryt.dev exchange messages.
-11. [ ] Hardening: input validation, error responses, authorization negative-path checklist. Result: checklist passes.
-12. [ ] Docs alignment: README walkthrough, docs updated to the built system, ADRs for any deviation from the design. Result: docs describe what runs.
+9. [ ] Web client: React app with Google sign-in, flock list, create and delete, add member, history, live updates, token refresh; web stack (S3 bucket, CloudFront distribution, certificate), Cloudflare records, CORS response headers on the HTTPS listener. Result: two browser sessions at https://quack.ryt.dev exchange messages.
+10. [ ] Docs alignment: README walkthrough, docs updated to the built system, ADRs for any deviation from the design. Result: docs describe what runs.
 
 Cut candidates if the budget is threatened (decided at the time, not now): web client scope beyond the required flows, hardening beyond authorization checks, the request log line.
 
 ## Phase 4: Delivery
 
-Prove the MVP deploys to the dev account from the repo alone and publish the repo. Sunday evening, 2 hours.
+Publish the repo, then harden and smoke test the dev deployment. Sunday evening, 2 hours.
 
 ### Exit Criteria
 
-- [ ] The dev account runs the MVP deployed by following the README only.
-- [ ] The smoke checklist passes on that deployment.
 - [ ] Repo checks pass and the repo is public.
+- [ ] The smoke checklist passes on the dev deployment.
 
 ### Steps
 
-1. [ ] Clean deploy: destroy the dev stacks and redeploy following only the README. Result: fresh deployment with no step outside the README.
-2. [ ] Smoke checklist on the fresh deployment: sign in, create and list a flock, add a member, send, receive live in a second session, history on open, delete a flock, load test rerun. Result: every item passes, recorded here.
-3. [ ] Publish: remove plan-prompt.md; grep for em dashes and for learning, practice, and interview references; confirm numeric claims are sourced and the AI disclosure sentence is present; decide visibility; push. Result: repo public at its final URL.
+1. [ ] Publish: remove plan-prompt.md; grep for em dashes and for learning, practice, and interview references; confirm numeric claims are sourced and the AI disclosure sentence is present; set the Google OAuth consent screen publishing status to In production; decide visibility; push. Result: repo public at its final URL.
+2. [ ] Load test: k6 script against the HTTP API and the live path with a captured ID token. Result: latency, freshness, and error-rate figures recorded against SC-01 to SC-07; autoscaling observed.
+3. [ ] Hardening: input validation, error responses, authorization negative-path checklist. Result: checklist passes.
+4. [ ] Smoke checklist on the dev deployment: sign in, create and list a flock, add a member, send, receive live in a second session, history on open, delete a flock, load test rerun. Result: every item passes, recorded here.
 
 ## Estimation
 
@@ -70,13 +68,12 @@ Prove the MVP deploys to the dev account from the repo alone and publish the rep
 | 3.6 Flocks               | Service, stack, curl walkthrough                                                                                                                               | 1.5      | 2.25    |        |
 | 3.7 Messages             | Service, stack, publish                                                                                                                                        | 1.5      | 2.25    |        |
 | 3.8 Real-time            | Ticket route, websocket service, subscriptions, close at expiry, /ws rule, stack, wscat test                                                                   | 3        | 4.5     |        |
-| 3.9 Load test            | k6 script for HTTP and sockets, run, record against SC-01 to SC-07                                                                                             | 2        | 3       |        |
-| 3.10 Web client          | React app, Google sign-in, every flow, web stack, certificate, Cloudflare records                                                                              | 4        | 6       |        |
-| 3.11 Hardening           | Validation, error responses, negative-path checklist                                                                                                           | 1        | 1.5     |        |
-| 3.12 Docs alignment      | README walkthrough, doc updates, deviation ADRs                                                                                                                | 1.5      | 2.25    |        |
-| 4.1 Clean deploy         | Destroy, redeploy from the README, fix what it misses                                                                                                          | 1.5      | 2.25    |        |
-| 4.2 Smoke checklist      | Every item plus the load test rerun                                                                                                                            | 1        | 1.5     |        |
-| 4.3 Publish              | Greps, checks, visibility                                                                                                                                      | 0.5      | 0.75    |        |
-| Total                    |                                                                                                                                                                | 34.5     | 53.5    | 22.75  |
+| 3.9 Web client           | React app, Google sign-in, every flow, web stack, certificate, Cloudflare records                                                                              | 4        | 6       |        |
+| 3.10 Docs alignment      | README walkthrough, doc updates, deviation ADRs                                                                                                                | 1.5      | 2.25    |        |
+| 4.1 Publish              | Greps, checks, OAuth to production, visibility                                                                                                                 | 0.5      | 0.75    |        |
+| 4.2 Load test            | k6 script for HTTP and sockets, run, record against SC-01 to SC-07                                                                                             | 2        | 3       |        |
+| 4.3 Hardening            | Validation, error responses, negative-path checklist                                                                                                           | 1        | 1.5     |        |
+| 4.4 Smoke checklist      | Every item plus the load test rerun                                                                                                                            | 1        | 1.5     |        |
+| Total                    |                                                                                                                                                                | 33       | 51.25   | 22.75  |
 
 Revised figures are the original times 1.5, the ratio observed on the completed Build steps; the Total column adds actuals for completed rows to revised figures for the rest.

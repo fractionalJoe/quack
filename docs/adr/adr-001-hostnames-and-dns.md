@@ -12,7 +12,7 @@ Related ADRs:
 
 ## Question Under Consideration
 
-The service exposes public endpoints: the web client and the API. What hostnames do they serve on, and which DNS provider holds the records? The domain ryt.dev is registered with DNS hosted in Cloudflare. Google Sign-In requires the client's origin to be registered on the OAuth client ahead of time, and Phase 4 destroys and redeploys the stacks, making persistent hostnames beneficial.
+The service exposes public endpoints: the web client and the API. What hostnames do they serve on, and which DNS provider holds the records? The domain ryt.dev is registered with DNS hosted in Cloudflare. Google Sign-In requires the client's origin to be registered on the OAuth client ahead of time, so a hostname that survives a redeploy of the stacks is beneficial.
 
 ## Decision
 
@@ -34,7 +34,7 @@ Criteria are scored 1 to 5 for this context: 1 is highly unfavorable, 3 is neutr
 
 ### Option 1 - No custom domain
 
-Endpoints serve on the CloudFront and API Gateway default hostnames. Nothing outside CDK. Hostnames are known only after the first deploy and change on redeploy, so the Google OAuth client origin and the client's API base URL are edited after every clean deploy. Whether Google accepts a cloudfront.net origin was not verified.
+Endpoints serve on the CloudFront and API Gateway default hostnames. Nothing outside CDK. Hostnames are known only after the first deploy and change on redeploy, so the Google OAuth client origin and the client's API base URL are edited after every redeploy. Whether Google accepts a cloudfront.net origin was not verified.
 
 ### Option 2 - Custom domain in Route 53
 

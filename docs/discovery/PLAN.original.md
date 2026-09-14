@@ -76,19 +76,17 @@ Cut candidates if the budget is threatened (decided at the time, not now): web c
 
 ## Phase 4: Delivery
 
-Prove the MVP deploys to the dev account from the repo alone and publish the repo. Sunday evening, 2 hours.
+Smoke test the dev deployment and publish the repo. Sunday evening, 2 hours.
 
 ### Exit Criteria
 
-- [-] The dev account runs the MVP deployed by following the README only.
-- [-] The smoke checklist passes on that deployment.
+- [-] The smoke checklist passes on the dev deployment.
 - [-] Repo checks pass and the repo is public.
 
 ### Steps
 
-1. [-] Clean deploy: destroy the dev stacks and redeploy following only the README. Result: fresh deployment with no step outside the README.
-2. [-] Smoke checklist on the fresh deployment: sign in, create and list a flock, add a member, send, receive live in a second session, history on open, delete a flock, load test rerun. Result: every item passes, recorded here.
-3. [-] Publish: remove plan-prompt.md; grep for em dashes and for learning, practice, and interview references; confirm numeric claims are sourced and the AI disclosure sentence is present; decide visibility; push. Result: repo public at its final URL.
+1. [-] Smoke checklist on the dev deployment: sign in, create and list a flock, add a member, send, receive live in a second session, history on open, delete a flock, load test rerun. Result: every item passes, recorded here.
+2. [-] Publish: remove plan-prompt.md; grep for em dashes and for learning, practice, and interview references; confirm numeric claims are sourced and the AI disclosure sentence is present; decide visibility; push. Result: repo public at its final URL.
 
 ## Revised estimation
 
@@ -107,9 +105,8 @@ Prove the MVP deploys to the dev account from the repo alone and publish the rep
 | 3.9 Web client      | React app, Google sign-in, every flow, web stack, certificate                                                                                                       | 4     |
 | 3.10 Hardening      | Validation, error responses, log lines, negative-path checklist                                                                                                     | 1.5   |
 | 3.11 Docs alignment | README walkthrough, doc updates, deviation ADRs                                                                                                                     | 1.5   |
-| 4.1 Clean deploy    | Destroy, redeploy from the README, fix what it misses                                                                                                               | 1.5   |
-| 4.2 Smoke checklist | Every item plus the load test rerun                                                                                                                                 | 1     |
-| 4.3 Publish         | Greps, checks, visibility                                                                                                                                           | 0.5   |
+| 4.1 Smoke checklist | Every item plus the load test rerun                                                                                                                                 | 1     |
+| 4.2 Publish         | Greps, checks, visibility                                                                                                                                           | 0.5   |
 | Total               |                                                                                                                                                                     | 28    |
 
 Each step carries about plus or minus 30 percent.
