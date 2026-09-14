@@ -4,7 +4,7 @@ Superseded on 2026-09-13 by [PLAN.md](PLAN.md), which carries the unfinished wor
 
 Quack is a minimal Slack-like chat service on AWS. Channels are called flocks.
 
-Timebox: Saturday 2026-09-12 and Sunday 2026-09-13. Phase budgets are working hours. When a step threatens its budget, the cut is named and decided before continuing.
+Initial estimate: one weekend, Saturday 2026-09-12 and Sunday 2026-09-13. Phase budgets are working hours. When a step threatens its budget, the cut is named and decided before continuing.
 
 Each step is one sitting and ends with the result named on it. Steps may be added or removed. Order within a phase does not change. A step is checked when its result is verified.
 
@@ -86,11 +86,13 @@ Smoke test the dev deployment and publish the repo. Sunday evening, 2 hours.
 ### Steps
 
 1. [-] Smoke checklist on the dev deployment: sign in, create and list a flock, add a member, send, receive live in a second session, history on open, delete a flock, load test rerun. Result: every item passes, recorded here.
-2. [-] Publish: remove plan-prompt.md; grep for em dashes and for learning, practice, and interview references; confirm numeric claims are sourced and the AI disclosure sentence is present; decide visibility; push. Result: repo public at its final URL.
+2. [-] Publish: confirm numeric claims are sourced and the AI disclosure sentence is present; decide visibility; push. Result: repo public at its final URL.
 
 ## Revised estimation
 
-**2029-09-13 19:45** Bottom-up estimate of the remaining work, made after Phase 2 closed at 7 hours 35 minutes against 3. One sitting per step; the first deploy of each new kind of thing (Actions OIDC, IAM database authentication from a task, WebSockets through the load balancer) is where a step goes over.
+The phase budgets above came from Claude. After Phase 2 it described them as a top-down estimate. The table below is the bottom-up estimate that replaced them; future estimates need prompting for bottom-up from the start.
+
+**2026-09-13 19:45** Bottom-up estimate of the remaining work, made after Phase 2 closed at 7 hours 35 minutes against 3. One sitting per step; the first deploy of each new kind of thing (Actions OIDC, IAM database authentication from a task, WebSockets through the load balancer) is where a step goes over.
 
 | Step                | Work                                                                                                                                                                | Hours |
 | ------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----- |

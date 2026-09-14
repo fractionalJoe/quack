@@ -12,7 +12,7 @@ Related ADRs: adr-004-http-entry-point.md, adr-005-fan-out-between-tasks.md, adr
 
 ## Question Under Consideration
 
-Which chat features are left out of the MVP, and what does the design already hold for each so that adding it later is additive? The Design Brief lists the cuts (OOS-01 to OOS-11); the timebox is one weekend (CON-01) and the purpose is to demonstrate real-time messaging with server-side authorization.
+Which chat features are left out of the MVP, and what does the design already hold for each so that adding it later is additive? The Design Brief lists the cuts (OOS-01 to OOS-11); the initial estimate is one weekend (CON-01) and the purpose is to demonstrate real-time messaging with server-side authorization.
 
 ## Decision
 
@@ -35,7 +35,7 @@ The items in the table are out of scope for the MVP. Each row names what the MVP
 
 ## Rationale
 
-None of the items is needed to show a message travelling from one browser to another through server-side authorization, and each would cost hours the timebox does not have. The cuts are safe because the data model and the fan-out topic already carry what each needs: a column, a policy, a route, or a socket event, with no rewrite of keys or flows.
+None of the items is needed to show a message travelling from one browser to another through server-side authorization, and each would cost hours the estimate does not include. The cuts are safe because the data model and the fan-out topic already carry what each needs: a column, a policy, a route, or a socket event, with no rewrite of keys or flows.
 
 ## Consequences
 

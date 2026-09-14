@@ -12,7 +12,7 @@ Related ADRs: adr-002-compute.md, adr-004-http-entry-point.md, adr-005-fan-out-b
 
 ## Question Under Consideration
 
-How is the code organised and how many CDK stacks deploy it? The system has a network, shared data stores, an ECS cluster with a load balancer, a static web client, three HTTP domains (ducks, flocks, messages), and a WebSocket service. One person builds and runs it in one weekend (CON-01, CON-02), and the repo is meant to be read as a demonstration of the architecture.
+How is the code organised and how many CDK stacks deploy it? The system has a network, shared data stores, an ECS cluster with a load balancer, a static web client, three HTTP domains (ducks, flocks, messages), and a WebSocket service. One person builds and runs it, with one weekend as the initial estimate (CON-01, CON-02), and the repo is meant to be read as a demonstration of the architecture.
 
 ## Decision
 

@@ -20,7 +20,7 @@ For the MVP, a service may read records owned by another domain directly from th
 
 ## Rationale
 
-This is a time-constrained choice, not the target design. The weekend timebox (CON-01) leaves no room for internal service networking, and a direct read is one data store call with no new infrastructure. The target is a call to the owning service over ECS Service Connect, which keeps each domain the only reader and writer of its data. The stated rule limits the debt: every cross-domain read is listed, so replacing them later is a known set of edits.
+This is a time-constrained choice, not the target design. The one-weekend estimate (CON-01) leaves no room for internal service networking, and a direct read is one data store call with no new infrastructure. The target is a call to the owning service over ECS Service Connect, which keeps each domain the only reader and writer of its data. The stated rule limits the debt: every cross-domain read is listed, so replacing them later is a known set of edits.
 
 ## Options
 

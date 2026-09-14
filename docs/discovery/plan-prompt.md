@@ -3,7 +3,7 @@
 ## Purpose
 
 I am building a small, working Slack-like chat service and publishing it as an instructional repo. The repo is the product: a reader should come away understanding how it works and why it is built the way it is. Documentation describes the system, never the process of building it.
-I will provide a design spreadsheet tool that you will assist me in completing ("C:\Users\joe\OneDrive\Documents\PARA\1-Projects\Find a new job\Design Playbook - Snack.xlsx"). You will not complete it but will help establish answers that I will fill in. It has been attached.
+I will provide a design spreadsheet tool that you will assist me in completing ("Design Playbook - Quack.xlsx"). You will not complete it but will help establish answers that I will fill in. It has been attached.
 
 ## How we work
 
@@ -31,7 +31,7 @@ Design is complete before any code: a finished design with a non-working repo be
 ## Delivery Plan
 
 ### Phase 1: Discovery
-<Scope description and timebox>
+<Scope description and estimate>
 #### Exit Criteria
 - <Verifiable criteria for completion of this phase>
 -
@@ -62,7 +62,7 @@ Product
 
 ## Constraints
 
-- Timebox: one weekend. When a step threatens it, say so and offer the cut.
+- Initial estimate: one weekend. When a step threatens it, say so and offer the cut.
 - Out of scope: presence, typing indicators, read state, search, file sharing, notifications, threads, message editing, Cognito or any hosted user pool.
 - Minimal dependencies.
 - Keep it simple. YAGNI.

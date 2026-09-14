@@ -2,7 +2,7 @@
 
 Quack is a minimal Slack-like chat service on AWS. Channels are called flocks.
 
-Timebox: Saturday 2026-09-12 and Sunday 2026-09-13. Phase budgets are working hours. When a step threatens its budget, the cut is named and decided before continuing.
+Initial estimate: one weekend, Saturday 2026-09-12 and Sunday 2026-09-13. Phase budgets are working hours. When a step threatens its budget, the cut is named and decided before continuing.
 
 Discovery, Design, and the Build environment step are complete; [PLAN.original.md](PLAN.original.md) records them. This plan carries the remaining work as slices: each slice builds one part of the system and deploys it through the GitHub Actions workflow before the next begins.
 
@@ -46,7 +46,7 @@ Publish the repo, then harden and smoke test the dev deployment. Sunday evening,
 
 ### Steps
 
-1. [ ] Publish: remove plan-prompt.md; grep for em dashes and for learning, practice, and interview references; confirm numeric claims are sourced and the AI disclosure sentence is present; set the Google OAuth consent screen publishing status to In production; decide visibility; push. Result: repo public at its final URL.
+1. [ ] Publish: confirm numeric claims are sourced and the AI disclosure sentence is present; set the Google OAuth consent screen publishing status to In production; decide visibility; push. Result: repo public at its final URL.
 2. [ ] Load test: k6 script against the HTTP API and the live path with a captured ID token. Result: latency, freshness, and error-rate figures recorded against SC-01 to SC-07; autoscaling observed.
 3. [ ] Hardening: input validation, error responses, authorization negative-path checklist. Result: checklist passes.
 4. [ ] Smoke checklist on the dev deployment: sign in, create and list a flock, add a member, send, receive live in a second session, history on open, delete a flock, load test rerun. Result: every item passes, recorded here.

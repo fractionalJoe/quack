@@ -12,7 +12,7 @@ Related ADRs: adr-003-capacity-provider.md, adr-007-stack-layout.md
 
 ## Question Under Consideration
 
-What runs the service code? The service serves an HTTP API and holds long-lived WebSocket connections for live delivery. The Scale and Estimates sheet projects 21.6 billion HTTP requests, 50.4 billion live deliveries, and 194 billion connection minutes per month at Slack scale, with 4.5 million connections open on average. The demo runs one month at near-zero load. One person builds and runs it (CON-02) in one weekend (CON-01).
+What runs the service code? The service serves an HTTP API and holds long-lived WebSocket connections for live delivery. The Scale and Estimates sheet projects 21.6 billion HTTP requests, 50.4 billion live deliveries, and 194 billion connection minutes per month at Slack scale, with 4.5 million connections open on average. The demo runs one month at near-zero load. One person builds and runs it (CON-02); the initial estimate is one weekend (CON-01).
 
 ## Decision
 

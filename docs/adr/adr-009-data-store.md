@@ -12,7 +12,7 @@ Related ADRs: adr-002-compute.md, adr-007-stack-layout.md, adr-008-cross-domain-
 
 ## Question Under Consideration
 
-What stores ducks, flocks, memberships, and messages? Every read or write of a flock is gated on membership and every delete on ownership (FR-09, NFR-05), every record carries the pond key (NFR-11), and a flock delete removes its memberships and messages with it (FR-08). The Scale and Estimates sheet projects about 25,600 backend reads and 7,800 backend writes per second at peak and about 70 TB stored at the 24 month horizon. A second region is a named future consideration (FC-03). One person builds it in one weekend (CON-01, CON-02) and the demo runs one month at near-zero load.
+What stores ducks, flocks, memberships, and messages? Every read or write of a flock is gated on membership and every delete on ownership (FR-09, NFR-05), every record carries the pond key (NFR-11), and a flock delete removes its memberships and messages with it (FR-08). The Scale and Estimates sheet projects about 25,600 backend reads and 7,800 backend writes per second at peak and about 70 TB stored at the 24 month horizon. A second region is a named future consideration (FC-03). One person builds it with one weekend as the initial estimate (CON-01, CON-02), and the demo runs one month at near-zero load.
 
 ## Decision
 
@@ -20,7 +20,7 @@ Aurora PostgreSQL Serverless v2 in one region is the data store. One cluster, on
 
 ## Rationale
 
-Authorization is the product's central requirement, and Postgres row-level security enforces pond and membership rules on every query regardless of which handler issued it. Memberships and cascading flock deletes are relational shapes: a join and a foreign key with ON DELETE CASCADE, against a fan of queries and batched deletes on a key-value store. Familiarity with Postgres makes this the shortest path in the timebox despite more infrastructure. The global path is active-passive with a homed pond, which is acceptable because a home region serializes each flock's writes and keeps message order identical everywhere. At scale the DynamoDB and Aurora estimates are within ten percent of each other, so cost does not decide.
+Authorization is the product's central requirement, and Postgres row-level security enforces pond and membership rules on every query regardless of which handler issued it. Memberships and cascading flock deletes are relational shapes: a join and a foreign key with ON DELETE CASCADE, against a fan of queries and batched deletes on a key-value store. Familiarity with Postgres makes this the shortest path despite more infrastructure. The global path is active-passive with a homed pond, which is acceptable because a home region serializes each flock's writes and keeps message order identical everywhere. At scale the DynamoDB and Aurora estimates are within ten percent of each other, so cost does not decide.
 
 ## Options
 

@@ -12,7 +12,7 @@ Related ADRs: adr-006-token-verification.md
 
 ## Question Under Consideration
 
-Who proves a user's identity? Every request and every socket must carry a verified identity (NFR-05), no credentials may be stored (NFR-07), and the service is one person's weekend build (CON-01, CON-02). The Design Brief lists the provider as the one external dependency (DEP-01).
+Who proves a user's identity? Every request and every socket must carry a verified identity (NFR-05), no credentials may be stored (NFR-07), and one person builds the service with one weekend as the initial estimate (CON-01, CON-02). The Design Brief lists the provider as the one external dependency (DEP-01).
 
 ## Decision
 
@@ -42,7 +42,7 @@ A hosted pool federating to Google, issuing its own tokens. Adds a pool, a hoste
 
 ### Option 3 - Own username and password
 
-A credential table, hashing, reset flows, and rate limiting. Stores credentials, against NFR-07, and costs the weekend.
+A credential table, hashing, reset flows, and rate limiting. Stores credentials, against NFR-07, and costs most of the estimated time.
 
 ## Consequences
 

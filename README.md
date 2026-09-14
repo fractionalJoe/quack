@@ -1,8 +1,35 @@
 # Quack
 
-A minimal Slack-like chat service on AWS. Channels are called flocks.
+A minimal Slack-like chat service on AWS, built to show the architecture and implementation of a real-time messaging service end to end: infrastructure as code, a few small domain services, live delivery over WebSockets, and a decision record for every choice that shaped it.
 
-Start at [docs/README.md](docs/README.md).
+## Overview
+
+Users sign in with Google, join flocks (channels) inside a pond (tenant), and exchange messages that arrive live over a WebSocket.
+
+**How it runs**
+
+- Node services on ECS Fargate behind one Application Load Balancer: `ducks` (users, sign-in, socket tickets), `flocks` (channels and membership), `messages` (send and history), and `websocket` (live delivery).
+- Aurora PostgreSQL Serverless v2 holds every entity. Row-level security enforces pond isolation and flock membership on every query.
+- ElastiCache Valkey pub/sub fans messages out between tasks.
+- A static web client on S3 behind CloudFront.
+- Google Sign-In issues the OpenID Connect ID token that every service verifies in code. No passwords are stored anywhere; database connections use IAM authentication.
+
+Every stack deploys with CDK from GitHub Actions through OpenID Connect, so no long-lived AWS credentials exist in the repository or in GitHub.
+
+**Repository layout**
+
+| Path                | Contents                                                                    |
+| ------------------- | --------------------------------------------------------------------------- |
+| `packages/infra`    | VPC and subnets, plus the bootstrap IAM template for GitHub Actions         |
+| `packages/data`     | Aurora cluster, Valkey node, bastion host                                   |
+| `packages/compute`  | ECS cluster and load balancer                                               |
+| `packages/libs`     | Shared code: CDK base stack, database schema, config and token verification |
+| `docs/design`       | Architecture, data model, request flows, operational design                 |
+| `docs/adr`          | Decision records                                                            |
+| `docs/discovery`    | Delivery plan and design playbook                                           |
+| `.github/workflows` | Deploy pipeline                                                             |
+
+Start at [docs/README.md](docs/README.md) for the full design. Progress against the plan is tracked in [docs/discovery/PLAN.md](docs/discovery/PLAN.md).
 
 ## Setup
 
