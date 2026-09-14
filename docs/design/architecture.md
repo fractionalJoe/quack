@@ -92,7 +92,7 @@ Tickets are the one deliberate split: the ducks service issues a ticket into the
 
 ## Ponds
 
-A pond is a tenant. The MVP serves one pond with a fixed pond ID. Every record carries the pond ID in its key and every query is scoped by it. Multiple ponds is a named future enhancement (FC-01): the pond ID would come from the request context, such as a claim or the hostname, instead of a constant. Nothing else is built for it.
+A pond is a tenant. The MVP serves one pond, the one row in ponds, whose ID each service reads at start. Every record carries the pond ID in its key and every query is scoped by it. Multiple ponds is a named future enhancement (FC-01): the pond ID would come from the request context, such as a claim or the hostname, instead of the one row. Nothing else is built for it.
 
 ## Stacks
 

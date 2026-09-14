@@ -15,6 +15,27 @@
       "when": 1789335463931,
       "tag": "0001_security",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1789395727989,
+      "tag": "0002_add-uuid-default",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1789395778968,
+      "tag": "0003_seed-pond",
+      "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1789396002636,
+      "tag": "0004_pond-policies",
+      "breakpoints": true
     }
   ]
 }

@@ -43,7 +43,7 @@ The deploy role may assume the CDK bootstrap roles ([Bootstrapping](https://docs
 
 | Setting             | Value                                                                                                           |
 | ------------------- | --------------------------------------------------------------------------------------------------------------- |
-| Engine              | Aurora PostgreSQL 17.9, Serverless v2                                                                           |
+| Engine              | Aurora PostgreSQL 18.3, Serverless v2                                                                           |
 | Instances           | One writer, 0 to 2 ACU, pauses after one idle hour                                                              |
 | Database            | `quack`                                                                                                         |
 | Master user         | `postgres`; password generated and managed by RDS in Secrets Manager                                            |

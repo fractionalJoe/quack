@@ -1,0 +1,448 @@
+{
+  "id": "c086f628-b9b1-4f62-b181-15e0a1192986",
+  "prevId": "c5409e13-9b73-48d0-81f0-a998de8276cf",
+  "version": "7",
+  "dialect": "postgresql",
+  "tables": {
+    "public.ducks": {
+      "name": "ducks",
+      "schema": "",
+      "columns": {
+        "duck_id": {
+          "name": "duck_id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "uuidv7()"
+        },
+        "pond_id": {
+          "name": "pond_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "google_subject": {
+          "name": "google_subject",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "display_name": {
+          "name": "display_name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "ducks_pond_id_ponds_pond_id_fk": {
+          "name": "ducks_pond_id_ponds_pond_id_fk",
+          "tableFrom": "ducks",
+          "columnsFrom": [
+            "pond_id"
+          ],
+          "tableTo": "ponds",
+          "columnsTo": [
+            "pond_id"
+          ],
+          "onUpdate": "no action",
+          "onDelete": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {
+        "ducks_pond_id_google_subject_unique": {
+          "name": "ducks_pond_id_google_subject_unique",
+          "columns": [
+            "pond_id",
+            "google_subject"
+          ],
+          "nullsNotDistinct": false
+        },
+        "ducks_pond_id_display_name_unique": {
+          "name": "ducks_pond_id_display_name_unique",
+          "columns": [
+            "pond_id",
+            "display_name"
+          ],
+          "nullsNotDistinct": false
+        }
+      },
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.flocks": {
+      "name": "flocks",
+      "schema": "",
+      "columns": {
+        "flock_id": {
+          "name": "flock_id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "uuidv7()"
+        },
+        "pond_id": {
+          "name": "pond_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "name": {
+          "name": "name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "owner_id": {
+          "name": "owner_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "flocks_pond_id_ponds_pond_id_fk": {
+          "name": "flocks_pond_id_ponds_pond_id_fk",
+          "tableFrom": "flocks",
+          "columnsFrom": [
+            "pond_id"
+          ],
+          "tableTo": "ponds",
+          "columnsTo": [
+            "pond_id"
+          ],
+          "onUpdate": "no action",
+          "onDelete": "no action"
+        },
+        "flocks_owner_id_ducks_duck_id_fk": {
+          "name": "flocks_owner_id_ducks_duck_id_fk",
+          "tableFrom": "flocks",
+          "columnsFrom": [
+            "owner_id"
+          ],
+          "tableTo": "ducks",
+          "columnsTo": [
+            "duck_id"
+          ],
+          "onUpdate": "no action",
+          "onDelete": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {
+        "flocks_pond_id_name_unique": {
+          "name": "flocks_pond_id_name_unique",
+          "columns": [
+            "pond_id",
+            "name"
+          ],
+          "nullsNotDistinct": false
+        }
+      },
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.memberships": {
+      "name": "memberships",
+      "schema": "",
+      "columns": {
+        "flock_id": {
+          "name": "flock_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "duck_id": {
+          "name": "duck_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "pond_id": {
+          "name": "pond_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "added_by": {
+          "name": "added_by",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {
+        "memberships_duck_id_flock_id_index": {
+          "name": "memberships_duck_id_flock_id_index",
+          "columns": [
+            {
+              "expression": "duck_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "flock_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "with": {},
+          "method": "btree",
+          "concurrently": false
+        }
+      },
+      "foreignKeys": {
+        "memberships_flock_id_flocks_flock_id_fk": {
+          "name": "memberships_flock_id_flocks_flock_id_fk",
+          "tableFrom": "memberships",
+          "columnsFrom": [
+            "flock_id"
+          ],
+          "tableTo": "flocks",
+          "columnsTo": [
+            "flock_id"
+          ],
+          "onUpdate": "no action",
+          "onDelete": "cascade"
+        },
+        "memberships_duck_id_ducks_duck_id_fk": {
+          "name": "memberships_duck_id_ducks_duck_id_fk",
+          "tableFrom": "memberships",
+          "columnsFrom": [
+            "duck_id"
+          ],
+          "tableTo": "ducks",
+          "columnsTo": [
+            "duck_id"
+          ],
+          "onUpdate": "no action",
+          "onDelete": "no action"
+        },
+        "memberships_pond_id_ponds_pond_id_fk": {
+          "name": "memberships_pond_id_ponds_pond_id_fk",
+          "tableFrom": "memberships",
+          "columnsFrom": [
+            "pond_id"
+          ],
+          "tableTo": "ponds",
+          "columnsTo": [
+            "pond_id"
+          ],
+          "onUpdate": "no action",
+          "onDelete": "no action"
+        },
+        "memberships_added_by_ducks_duck_id_fk": {
+          "name": "memberships_added_by_ducks_duck_id_fk",
+          "tableFrom": "memberships",
+          "columnsFrom": [
+            "added_by"
+          ],
+          "tableTo": "ducks",
+          "columnsTo": [
+            "duck_id"
+          ],
+          "onUpdate": "no action",
+          "onDelete": "no action"
+        }
+      },
+      "compositePrimaryKeys": {
+        "memberships_flock_id_duck_id_pk": {
+          "name": "memberships_flock_id_duck_id_pk",
+          "columns": [
+            "flock_id",
+            "duck_id"
+          ]
+        }
+      },
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.messages": {
+      "name": "messages",
+      "schema": "",
+      "columns": {
+        "message_id": {
+          "name": "message_id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "uuidv7()"
+        },
+        "pond_id": {
+          "name": "pond_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "flock_id": {
+          "name": "flock_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "sender_id": {
+          "name": "sender_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "body": {
+          "name": "body",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {
+        "messages_flock_id_message_id_index": {
+          "name": "messages_flock_id_message_id_index",
+          "columns": [
+            {
+              "expression": "flock_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "message_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "with": {},
+          "method": "btree",
+          "concurrently": false
+        }
+      },
+      "foreignKeys": {
+        "messages_pond_id_ponds_pond_id_fk": {
+          "name": "messages_pond_id_ponds_pond_id_fk",
+          "tableFrom": "messages",
+          "columnsFrom": [
+            "pond_id"
+          ],
+          "tableTo": "ponds",
+          "columnsTo": [
+            "pond_id"
+          ],
+          "onUpdate": "no action",
+          "onDelete": "no action"
+        },
+        "messages_flock_id_flocks_flock_id_fk": {
+          "name": "messages_flock_id_flocks_flock_id_fk",
+          "tableFrom": "messages",
+          "columnsFrom": [
+            "flock_id"
+          ],
+          "tableTo": "flocks",
+          "columnsTo": [
+            "flock_id"
+          ],
+          "onUpdate": "no action",
+          "onDelete": "cascade"
+        },
+        "messages_sender_id_ducks_duck_id_fk": {
+          "name": "messages_sender_id_ducks_duck_id_fk",
+          "tableFrom": "messages",
+          "columnsFrom": [
+            "sender_id"
+          ],
+          "tableTo": "ducks",
+          "columnsTo": [
+            "duck_id"
+          ],
+          "onUpdate": "no action",
+          "onDelete": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {
+        "body_length": {
+          "name": "body_length",
+          "value": "char_length(\"messages\".\"body\") <= 4000"
+        }
+      },
+      "isRLSEnabled": false
+    },
+    "public.ponds": {
+      "name": "ponds",
+      "schema": "",
+      "columns": {
+        "pond_id": {
+          "name": "pond_id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "uuidv7()"
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    }
+  },
+  "enums": {},
+  "schemas": {},
+  "views": {},
+  "sequences": {},
+  "roles": {},
+  "policies": {},
+  "_meta": {
+    "columns": {},
+    "schemas": {},
+    "tables": {}
+  }
+}

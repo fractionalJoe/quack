@@ -18,7 +18,7 @@ One file per flow. Each shows the route, a sequence diagram, and the authorizati
 The browser sends the Google ID token as `Authorization: Bearer`. The load balancer routes by path prefix to one service. Before the route handler runs, the shared package:
 
 1. Verifies the token: signature against Google's cached keys, issuer, audience, expiry (ADR-006). Any failure is 401.
-2. Opens a transaction and sets app.pond_id from configuration and app.google_subject from the token's sub claim.
+2. Opens a transaction and sets app.pond_id from the pond row read at start and app.google_subject from the token's sub claim.
 3. Resolves the caller: reads the duck by google_subject and sets app.duck_id. No row is 401; the client signs in first (WFL-01). Only the ducks service writes ducks.
 4. Runs the handler. The handler checks the route's rule in code and answers 403 on refusal; the row-level security policies in data-model.md enforce the same rule on every query.
 

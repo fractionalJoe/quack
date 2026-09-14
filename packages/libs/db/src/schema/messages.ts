@@ -7,7 +7,9 @@ import { sql } from "drizzle-orm";
 export const messages = pgTable(
   "messages",
   {
-    id: uuid("message_id").primaryKey(),
+    id: uuid("message_id")
+      .primaryKey()
+      .default(sql`uuidv7()`),
     pondId: uuid("pond_id")
       .notNull()
       .references(() => ponds.id),
