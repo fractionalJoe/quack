@@ -11,15 +11,27 @@ class TestStack extends QuackStack {
 }
 
 test("addStackOutput writes an output", () => {
-  const t = Template.fromStack(new TestStack());
-  t.hasOutput("Endpoint", { Value: "db.example" });
-  t.resourceCountIs("AWS::SSM::Parameter", 0);
+  // given
+  const stack = new TestStack();
+
+  // when
+  const template = Template.fromStack(stack);
+
+  // then
+  template.hasOutput("Endpoint", { Value: "db.example" });
+  template.resourceCountIs("AWS::SSM::Parameter", 0);
 });
 
 test("addStackOutput writes a parameter when a name is given", () => {
-  const t = Template.fromStack(new TestStack("/quack/data/endpoint"));
-  t.hasOutput("Endpoint", { Value: "db.example" });
-  t.hasResourceProperties("AWS::SSM::Parameter", {
+  // given
+  const stack = new TestStack("/quack/data/endpoint");
+
+  // when
+  const template = Template.fromStack(stack);
+
+  // then
+  template.hasOutput("Endpoint", { Value: "db.example" });
+  template.hasResourceProperties("AWS::SSM::Parameter", {
     Name: "/quack/data/endpoint",
     Type: "String",
     Value: "db.example",

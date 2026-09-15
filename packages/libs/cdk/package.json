@@ -9,7 +9,7 @@
   "scripts": {
     "build": "tsc",
     "typecheck": "tsc --noEmit",
-    "test:unit": "tsx --test src/**/*.test.ts"
+    "test:unit": "tsx --test \"src/**/*.test.ts\""
   },
   "devDependencies": {
     "aws-cdk-lib": "^2.269.0",

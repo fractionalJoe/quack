@@ -308,6 +308,9 @@ importers:
 
   packages/libs/shared:
     dependencies:
+      fastify:
+        specifier: ^5.12.4
+        version: 5.12.4
       jose:
         specifier: ^6.2.12
         version: 6.2.12

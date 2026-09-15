@@ -9,9 +9,10 @@
   "scripts": {
     "build": "tsc",
     "typecheck": "tsc --noEmit",
-    "test:unit": "tsx --test src/**/*.test.ts"
+    "test:unit": "tsx --test \"src/**/*.test.ts\""
   },
   "dependencies": {
+    "fastify": "^5.12.4",
     "jose": "^6.2.12"
   }
 }
