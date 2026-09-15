@@ -8,4 +8,6 @@ if (!account) throw new Error("CDK_DEFAULT_ACCOUNT is not set; run with AWS cred
 const app = new App();
 new DucksServiceStack(app, {
   env: { account, region: config.primary.region },
+  databaseName: config.primary.auroraCluster.defaultDatabaseName,
+  vpcName: config.primary.vpcName,
 });

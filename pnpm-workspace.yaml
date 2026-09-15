@@ -1,5 +1,6 @@
 packages:
   - "packages/**/*"
+  - "!**/cdk.out/**"
 allowBuilds:
   esbuild: true
 # drizzle-kit migrate over the Data API fails with newer client versions
