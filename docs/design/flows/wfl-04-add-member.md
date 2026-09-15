@@ -4,8 +4,8 @@ FR-04, WFL-04. A member adds another duck to a flock. The client holds the pond'
 
 Routes:
 
-- `GET /ducks`, ducks service. Response 200 `[{ duckId, displayName }]`, every duck in the pond.
-- `POST /flocks/{flockId}/members`, flocks service. Body `{ duckId }`. Response 201 `{ flockId, duckId }`.
+- `GET /ponds/{pondId}/ducks`, ducks service. Response 200 `[{ duckId, displayName }]`, every duck in the pond.
+- `POST /ponds/{pondId}/flocks/{flockId}/members`, flocks service. Body `{ duckId }`. Response 201 `{ flockId, duckId }`.
 
 ```mermaid
 ---
@@ -18,12 +18,12 @@ sequenceDiagram
     participant D as ducks service
     participant F as flocks service
     participant DB as Aurora
-    B->>D: GET /ducks, bearer token
+    B->>D: GET /ponds/{pondId}/ducks, bearer token
     D->>D: verify token, resolve caller
     D->>DB: AP-16 select ducks
     DB-->>D: ducks
     D-->>B: 200 ducks
-    B->>F: POST /flocks/{flockId}/members { duckId }, bearer token
+    B->>F: POST /ponds/{pondId}/flocks/{flockId}/members { duckId }, bearer token
     F->>F: verify token, resolve caller
     F->>DB: AP-06 membership of caller in flock
     DB-->>F: membership or none

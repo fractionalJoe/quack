@@ -2,7 +2,7 @@
 
 FR-05, FR-06, WFL-05. A member sends a message to a flock. Connected members receive it through the fan-out.
 
-Route: `POST /messages/{flockId}`, messages service. Body `{ body }`. Response 201 `{ messageId, flockId, senderId }`.
+Route: `POST /ponds/{pondId}/messages/{flockId}`, messages service. Body `{ body }`. Response 201 `{ messageId, flockId, senderId }`.
 
 ```mermaid
 ---
@@ -17,7 +17,7 @@ sequenceDiagram
     participant V as Valkey
     participant W as websocket service
     participant R as Recipient browsers
-    B->>M: POST /messages/{flockId} { body }, bearer token
+    B->>M: POST /ponds/{pondId}/messages/{flockId} { body }, bearer token
     M->>M: verify token, resolve caller
     M->>M: validate body, at most 4,000 characters
     M->>DB: AP-06 membership of caller in flock

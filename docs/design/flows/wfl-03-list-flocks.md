@@ -2,7 +2,7 @@
 
 FR-03, WFL-03. A duck lists the flocks they belong to.
 
-Route: `GET /flocks`, flocks service. Response 200 `[{ flockId, name, ownerId }]`.
+Route: `GET /ponds/{pondId}/flocks`, flocks service. Response 200 `[{ flockId, name, ownerId }]`.
 
 ```mermaid
 ---
@@ -14,7 +14,7 @@ sequenceDiagram
     participant B as Browser
     participant F as flocks service
     participant DB as Aurora
-    B->>F: GET /flocks, bearer token
+    B->>F: GET /ponds/{pondId}/flocks, bearer token
     F->>F: verify token, resolve caller
     F->>DB: AP-07 memberships WHERE duck_id = caller, joined to flocks
     DB-->>F: flocks

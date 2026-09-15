@@ -2,7 +2,7 @@
 
 FR-08, WFL-08. The owner deletes a flock. Its memberships and messages go with it.
 
-Route: `DELETE /flocks/{flockId}`, flocks service. Response 200 `{ flockId }`.
+Route: `DELETE /ponds/{pondId}/flocks/{flockId}`, flocks service. Response 200 `{ flockId }`.
 
 ```mermaid
 ---
@@ -14,7 +14,7 @@ sequenceDiagram
     participant B as Browser
     participant F as flocks service
     participant DB as Aurora
-    B->>F: DELETE /flocks/{flockId}, bearer token
+    B->>F: DELETE /ponds/{pondId}/flocks/{flockId}, bearer token
     F->>F: verify token, resolve caller
     F->>DB: AP-04 select flock
     DB-->>F: flock or none

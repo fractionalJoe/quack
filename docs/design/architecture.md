@@ -18,9 +18,9 @@ flowchart LR
     Browser -->|"wss://api.quack.ryt.dev/ws"| ALB
 
     subgraph VPC
-        ALB -->|"/ducks/*"| Ducks["ducks service"]
-        ALB -->|"/flocks/*"| Flocks["flocks service"]
-        ALB -->|"/messages/*"| Messages["messages service"]
+        ALB -->|"/ducks/*, /ponds/*/ducks/*"| Ducks["ducks service"]
+        ALB -->|"/ponds/*/flocks/*"| Flocks["flocks service"]
+        ALB -->|"/ponds/*/messages/*"| Messages["messages service"]
         ALB -->|"/ws"| WS["websocket service"]
 
         Ducks --> DS[("Aurora PostgreSQL")]
@@ -56,7 +56,7 @@ flowchart LR
 
 ## Request paths
 
-HTTP: the browser sends the ID token as a bearer token. The load balancer routes by path to one service. The service verifies the token, applies the authorization rule for the route, reads or writes the data store, and responds. A send also publishes the message to the flock's fan-out topic.
+HTTP: the browser sends the ID token as a bearer token and, on every route except sign-in, the pond ID in the path. The load balancer routes by path to one service. The service verifies the token, applies the authorization rule for the route, reads or writes the data store, and responds. A send also publishes the message to the flock's fan-out topic.
 
 WebSocket: the browser calls the ducks service's tickets route with its bearer token and receives a one-time ticket. It opens the socket with the ticket in the query string. The websocket service redeems the ticket, binds the socket to the user, and subscribes to the topic of each flock the user belongs to. When a message is published to a subscribed topic, the service pushes it to every socket on that task whose user is a member. On close it drops the socket and unsubscribes from topics no remaining socket needs. Sockets are held in task memory; no connection record is stored.
 
@@ -92,7 +92,7 @@ Tickets are the one deliberate split: the ducks service issues a ticket into the
 
 ## Ponds
 
-A pond is a tenant. The MVP serves one pond, the one row in ponds, whose ID each service reads at start. Every record carries the pond ID in its key and every query is scoped by it. Multiple ponds is a named future enhancement (FC-01): the pond ID would come from the request context, such as a claim or the hostname, instead of the one row. Nothing else is built for it.
+A pond is a tenant. The MVP serves one pond, the one row in ponds. Sign-in assigns it to the duck and returns its ID; every later request carries the ID in its path, and the resolve step admits only a duck that exists in that pond. Every record carries the pond ID in its key and every query is scoped by it. Multiple ponds is a named future enhancement (FC-01): the pond ID would come from the request context, such as a claim or the hostname, instead of the path. Nothing else is built for it.
 
 ## Stacks
 

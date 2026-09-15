@@ -2,7 +2,7 @@
 
 FR-07, WFL-06. A member opening a flock loads its most recent messages.
 
-Route: `GET /messages/{flockId}`, messages service. Response 200 `[{ messageId, flockId, senderId, body, createdAt }]`, 50 at most, newest first.
+Route: `GET /ponds/{pondId}/messages/{flockId}`, messages service. Response 200 `[{ messageId, flockId, senderId, body, createdAt }]`, 50 at most, newest first.
 
 ```mermaid
 ---
@@ -14,7 +14,7 @@ sequenceDiagram
     participant B as Browser
     participant M as messages service
     participant DB as Aurora
-    B->>M: GET /messages/{flockId}, bearer token
+    B->>M: GET /ponds/{pondId}/messages/{flockId}, bearer token
     M->>M: verify token, resolve caller
     M->>DB: AP-06 membership of caller in flock
     DB-->>M: membership or none

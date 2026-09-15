@@ -2,7 +2,7 @@
 
 FR-02, WFL-02. A signed-in duck creates a named flock and becomes its owner and first member.
 
-Route: `POST /flocks`, flocks service. Body `{ name }`. Response 201 `{ flockId, name, ownerId }`.
+Route: `POST /ponds/{pondId}/flocks`, flocks service. Body `{ name }`. Response 201 `{ flockId, name, ownerId }`.
 
 ```mermaid
 ---
@@ -14,7 +14,7 @@ sequenceDiagram
     participant B as Browser
     participant F as flocks service
     participant DB as Aurora
-    B->>F: POST /flocks { name }, bearer token
+    B->>F: POST /ponds/{pondId}/flocks { name }, bearer token
     F->>F: verify token, resolve caller
     F->>F: validate name
     F->>DB: AP-03 insert flock (owner_id = caller), insert membership (duck_id = caller, added_by = caller), one transaction

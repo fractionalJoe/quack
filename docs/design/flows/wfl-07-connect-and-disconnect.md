@@ -4,7 +4,7 @@ WFL-07, AP-14. A duck opens one WebSocket for live delivery and it is cleaned up
 
 Routes:
 
-- `POST /ducks/me/tickets`, ducks service. Response 201 `{ ticket }`.
+- `POST /ponds/{pondId}/ducks/me/tickets`, ducks service. Response 201 `{ ticket }`.
 - `wss://api.quack.ryt.dev/ws?ticket={ticket}`, websocket service.
 
 ```mermaid
@@ -19,7 +19,7 @@ sequenceDiagram
     participant V as Valkey
     participant W as websocket service
     participant DB as Aurora
-    B->>D: POST /ducks/me/tickets, bearer token
+    B->>D: POST /ponds/{pondId}/ducks/me/tickets, bearer token
     D->>D: verify token, resolve caller
     D->>V: SET ticket:{random} { pondId, duckId, tokenExp } with a short expiry
     D-->>B: 201 { ticket }
