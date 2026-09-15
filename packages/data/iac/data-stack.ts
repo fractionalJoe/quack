@@ -18,9 +18,7 @@ export class DataStack extends QuackStack {
   constructor(scope: Construct, props: DataStackProps) {
     super(scope, "QuackDataStack", props);
 
-    const vpc = Vpc.fromLookup(this, "Vpc", {
-      vpcName: props.vpcName,
-    });
+    const vpc = Vpc.fromLookup(this, "Vpc", { vpcName: props.vpcName });
 
     const cluster = new AuroraCluster(this, {
       autoPauseSeconds: props.autoPauseSeconds,
@@ -41,25 +39,25 @@ export class DataStack extends QuackStack {
 
     const valkey = new ValkeyNode(this, { vpc });
 
-    this.addStackOutput("ClusterArn", cluster.clusterArn, parameters.data.clusterArn);
-    this.addStackOutput("ClusterSecretArn", cluster.secretArn, parameters.data.secretArn);
+    this.addStackOutput("ClusterArn", cluster.clusterArn, parameters.data.aurora.clusterArn);
+    this.addStackOutput("ClusterSecretArn", cluster.secretArn, parameters.data.aurora.secretArn);
     this.addStackOutput(
       "ClusterResourceId",
       cluster.resourceIdentifier,
-      parameters.data.clusterResourceId,
+      parameters.data.aurora.clusterResourceId,
     );
-    this.addStackOutput("ClusterEndpoint", cluster.endpoint, parameters.data.endpoint);
+    this.addStackOutput("ClusterEndpoint", cluster.endpoint, parameters.data.aurora.endpoint);
     this.addStackOutput(
       "ClusterSecurityGroupId",
       cluster.clusterSecurityGroup.securityGroupId,
-      parameters.data.securityGroupId,
+      parameters.data.aurora.securityGroupId,
     );
     this.addStackOutput("BastionSecurityGroupId", bastion.securityGroup.securityGroupId);
-    this.addStackOutput("ValkeyEndpoint", valkey.endpoint, parameters.data.valkeyEndpoint);
+    this.addStackOutput("ValkeyEndpoint", valkey.endpoint, parameters.data.valkey.endpoint);
     this.addStackOutput(
       "ValkeySecurityGroupId",
       valkey.securityGroup.securityGroupId,
-      parameters.data.valkeySecurityGroupId,
+      parameters.data.valkey.securityGroupId,
     );
   }
 }

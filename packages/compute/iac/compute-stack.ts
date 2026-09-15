@@ -16,9 +16,7 @@ export class ComputeStack extends QuackStack {
   constructor(scope: Construct, props: ComputeStackProps) {
     super(scope, "QuackComputeStack", props);
 
-    const vpc = Vpc.fromLookup(this, "Vpc", {
-      vpcName: props.vpcName,
-    });
+    const vpc = Vpc.fromLookup(this, "Vpc", { vpcName: props.vpcName });
 
     const cluster = new Cluster(this, "Cluster", { vpc });
 
@@ -33,16 +31,20 @@ export class ComputeStack extends QuackStack {
     });
 
     this.addStackOutput("ClusterName", cluster.clusterName, parameters.compute.clusterName);
-    this.addStackOutput("ListenerArn", loadBalancer.listenerArn, parameters.compute.listenerArn);
+    this.addStackOutput(
+      "ListenerArn",
+      loadBalancer.listenerArn,
+      parameters.compute.alb.listenerArn,
+    );
     this.addStackOutput(
       "AlbSecurityGroupId",
       loadBalancer.securityGroup.securityGroupId,
-      parameters.compute.albSecurityGroupId,
+      parameters.compute.alb.securityGroupId,
     );
     this.addStackOutput(
       "AlbDnsName",
       loadBalancer.loadBalancerDnsName,
-      parameters.compute.albDnsName,
+      parameters.compute.alb.dnsName,
     );
   }
 }
