@@ -27,6 +27,10 @@ on:
         description: Deploy Migrations
         type: boolean
         default: false
+      ducks:
+        description: Deploy QuackDucksServiceStack
+        type: boolean
+        default: false
 
 permissions:
   id-token: write
@@ -40,6 +44,7 @@ jobs:
       compute: ${{ steps.filter.outputs.compute }}
       data: ${{ steps.filter.outputs.data }}
       migrate: ${{ steps.filter.outputs.migrate }}
+      ducks: ${{ steps.filter.outputs.ducks }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v6
@@ -66,6 +71,11 @@ jobs:
               - .github/**
             migrate:
               - packages/libs/db/**
+              - .github/**
+            ducks:
+              - packages/services/ducks/**
+              - packages/libs/**
+              - pnpm-workspace.yaml
               - .github/**
 
   build:
@@ -195,3 +205,29 @@ jobs:
 
       - name: Migrate
         run: pnpm db migrate
+
+  ducks:
+    needs: [changes, build, compute, migrate]
+    # Build must pass, compute and migrate must each pass or be skipped,
+    # then run on a ducks change or on dispatch with the ducks input.
+    if: >-
+      !cancelled() && needs.build.result == 'success' &&
+      (needs.compute.result == 'success' || needs.compute.result == 'skipped') &&
+      (needs.migrate.result == 'success' || needs.migrate.result == 'skipped') &&
+      (
+        needs.changes.outputs.ducks == 'true' ||
+        (github.event_name == 'workflow_dispatch' && inputs.ducks)
+      )
+    runs-on: ubuntu-latest
+    environment: ${{ github.event.inputs.deploy_environment || 'dev' }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
+      - name: Setup
+        uses: ./.github/actions/setup
+        with:
+          role-to-assume: ${{ vars.AWS_DEPLOY_ROLE_ARN }}
+
+      - name: Deploy QuackDucksServiceStack
+        run: pnpm ducks cdk deploy QuackDucksServiceStack --require-approval never
