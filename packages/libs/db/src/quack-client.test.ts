@@ -26,7 +26,7 @@ const pondId = "pond-1";
 test("sets the pond and the duck when only the duck is known", async () => {
   // given
   const { db, statements } = fakeDb();
-  const client = new QuackClient(pondId, { duckId: "duck-1" }, db);
+  const client = new QuackClient({ duckId: "duck-1" }, pondId, db);
 
   // when
   await client.execute(async () => undefined);
@@ -43,7 +43,7 @@ test("sets the pond and the duck when only the duck is known", async () => {
 test("sets the pond and the subject when only the subject is known", async () => {
   // given
   const { db, statements } = fakeDb();
-  const client = new QuackClient(pondId, { googleSubject: "sub-1" }, db);
+  const client = new QuackClient({ googleSubject: "sub-1" }, pondId, db);
 
   // when
   await client.execute(async () => undefined);
@@ -59,7 +59,7 @@ test("sets the pond and the subject when only the subject is known", async () =>
 test("sets all three when both are known", async () => {
   // given
   const { db, statements } = fakeDb();
-  const client = new QuackClient(pondId, { duckId: "duck-1", googleSubject: "sub-1" }, db);
+  const client = new QuackClient({ duckId: "duck-1", googleSubject: "sub-1" }, pondId, db);
 
   // when
   await client.execute(async () => undefined);
@@ -71,10 +71,26 @@ test("sets all three when both are known", async () => {
   );
 });
 
+test("sets only the subject when no pond is given", async () => {
+  // given
+  const { db, statements } = fakeDb();
+  const client = new QuackClient({ googleSubject: "sub-1" }, undefined, db);
+
+  // when
+  await client.execute(async () => undefined);
+
+  // then
+  assert.deepEqual(
+    statements.map((s) => s.params),
+    [["sub-1"]],
+  );
+  assert.match(statements[0]!.sql, /set_config\('app\.google_subject', \$1, true\)/);
+});
+
 test("the settings are in place before the query runs and its result is returned", async () => {
   // given
   const { db, statements } = fakeDb();
-  const client = new QuackClient(pondId, { duckId: "duck-1" }, db);
+  const client = new QuackClient({ duckId: "duck-1" }, pondId, db);
 
   // when
   const result = await client.execute(async () => statements.length);
@@ -86,7 +102,7 @@ test("the settings are in place before the query runs and its result is returned
 test("a query failure propagates", async () => {
   // given
   const { db } = fakeDb();
-  const client = new QuackClient(pondId, { duckId: "duck-1" }, db);
+  const client = new QuackClient({ duckId: "duck-1" }, pondId, db);
 
   // when
   const result = client.execute(async () => {

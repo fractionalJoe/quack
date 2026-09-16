@@ -20,14 +20,16 @@ type Identity =
 
 export class QuackClient {
   constructor(
-    private readonly pondId: string,
     private readonly id: Identity,
+    private readonly pondId?: string,
     private readonly db: NodePgDatabase<typeof schema> = initDb(),
   ) {}
 
   public execute<T>(query: (tx: Transaction) => Promise<T>): Promise<T> {
     return this.db.transaction(async (tx) => {
-      await tx.execute(sql`select set_config('app.pond_id', ${this.pondId}, true)`);
+      if (this.pondId) {
+        await tx.execute(sql`select set_config('app.pond_id', ${this.pondId}, true)`);
+      }
       if (this.id.duckId) {
         await tx.execute(sql`select set_config('app.duck_id', ${this.id.duckId}, true)`);
       }

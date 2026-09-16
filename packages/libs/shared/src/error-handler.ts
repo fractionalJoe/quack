@@ -1,5 +1,5 @@
 import type { FastifyInstance } from "fastify";
-import { AuthError } from "./caller-hook.ts";
+import { AuthError } from "./caller-hook-draft.ts";
 import { logger } from "./logger.ts";
 
 // Every error thrown by a hook or a handler ends here. The response body is a fixed label per
