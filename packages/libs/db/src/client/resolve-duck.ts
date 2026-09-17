@@ -1,8 +1,8 @@
-import { QuackClient } from "./quack-client.ts";
-import { ducks } from "./schema/ducks.ts";
 import { eq } from "drizzle-orm";
+import { QuackClient } from "./quack-client.ts";
+import { ducks } from "../schema/ducks.ts";
 
-async function resolveDuck(pondId: string, subject: string) {
+export async function resolveDuck(pondId: string, subject: string) {
   const [duck] = await new QuackClient({ googleSubject: subject }, pondId).execute((tx) =>
     tx
       .select({ duckId: ducks.id, name: ducks.displayName })

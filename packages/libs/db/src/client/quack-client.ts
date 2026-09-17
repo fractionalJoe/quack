@@ -1,7 +1,7 @@
 import { NodePgDatabase, type NodePgTransaction } from "drizzle-orm/node-postgres";
-import * as schema from "./schema/index.ts";
+import * as schema from "../schema/index.ts";
 import { sql, type ExtractTablesWithRelations } from "drizzle-orm";
-import { initDb } from "./db.ts";
+import { initDb } from "../db.ts";
 
 export type Transaction = NodePgTransaction<
   typeof schema,
@@ -19,11 +19,14 @@ type Identity =
     };
 
 export class QuackClient {
+  private readonly db: NodePgDatabase<typeof schema>;
+
   constructor(
     private readonly id: Identity,
     private readonly pondId?: string,
-    private readonly db: NodePgDatabase<typeof schema> = initDb(),
-  ) {}
+  ) {
+    this.db = initDb();
+  }
 
   public execute<T>(query: (tx: Transaction) => Promise<T>): Promise<T> {
     return this.db.transaction(async (tx) => {
