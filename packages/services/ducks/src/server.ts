@@ -1,6 +1,6 @@
 import Fastify, { type FastifyInstance } from "fastify";
-import { QuackClient, ducks, ponds, resolveDuck } from "@quack/db";
-import { callerHook, registerErrorHandler } from "@quack/shared";
+import { QuackClient, ducks, isUniqueViolation, ponds, resolveDuck } from "@quack/db";
+import { callerHook, ConflictError, registerErrorHandler } from "@quack/shared";
 
 // The load balancer stamps every request with this header; log lines carry it as the request ID.
 const app = Fastify({ requestIdHeader: "x-amzn-trace-id" });
@@ -16,16 +16,22 @@ app.register(async (api: FastifyInstance) => {
   api.put("/ducks/me", async (request) => {
     const { subject, name } = request.identity;
     const pondId = await getPond(subject);
-    const [duck] = await new QuackClient({ googleSubject: subject }, pondId).execute((tx) =>
-      tx
-        .insert(ducks)
-        .values({ pondId, googleSubject: subject, displayName: name })
-        .onConflictDoUpdate({
-          target: [ducks.pondId, ducks.googleSubject],
-          set: { displayName: name },
-        })
-        .returning({ duckId: ducks.id, displayName: ducks.displayName }),
-    );
+    let duck;
+    try {
+      [duck] = await new QuackClient({ googleSubject: subject }, pondId).execute((tx) =>
+        tx
+          .insert(ducks)
+          .values({ pondId, googleSubject: subject, displayName: name })
+          .onConflictDoUpdate({
+            target: [ducks.pondId, ducks.googleSubject],
+            set: { displayName: name },
+          })
+          .returning({ duckId: ducks.id, displayName: ducks.displayName }),
+      );
+    } catch (e) {
+      if (isUniqueViolation(e)) throw new ConflictError("display name taken");
+      throw e;
+    }
     return { ...duck!, pondId };
   });
 });

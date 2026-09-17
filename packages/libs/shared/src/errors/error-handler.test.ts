@@ -1,9 +1,10 @@
 import { test, before, after, beforeEach, afterEach, mock } from "node:test";
 import assert from "node:assert/strict";
 import Fastify, { type FastifyInstance } from "fastify";
-import { AuthError } from "./caller-hook.ts";
+import { AuthError } from "./auth-error.ts";
+import { ConflictError } from "./conflict-error.ts";
 import { registerErrorHandler } from "./error-handler.ts";
-import { logger } from "./logger.ts";
+import { logger } from "../logger.ts";
 
 let app: FastifyInstance;
 let writeLog: ReturnType<typeof mock.method>;
@@ -21,6 +22,9 @@ before(async () => {
       ok: true,
     }),
   );
+  app.get("/conflict", async () => {
+    throw new ConflictError("display name taken");
+  });
   app.get("/status", async () => {
     throw Object.assign(new Error("payload too large"), { statusCode: 413 });
   });
@@ -60,6 +64,21 @@ test("an AuthError is 401 with a fixed body and its reason in the log line", asy
   assert.equal(entry.method, "GET");
   assert.equal(entry.url, "/auth");
   assert.equal(typeof entry.requestId, "string");
+});
+
+test("a ConflictError is 409 with a fixed body and its reason in the log line", async () => {
+  // given
+  const url = "/conflict";
+
+  // when
+  const res = await app.inject({ method: "GET", url });
+
+  // then
+  assert.equal(res.statusCode, 409);
+  assert.deepEqual(res.json(), { error: "conflict" });
+  const entry = logged();
+  assert.equal(entry.status, 409);
+  assert.equal(entry.reason, "display name taken");
 });
 
 test("a schema validation failure keeps Fastify's 400", async () => {

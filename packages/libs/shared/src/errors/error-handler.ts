@@ -1,6 +1,7 @@
 import type { FastifyInstance } from "fastify";
-import { AuthError } from "./caller-hook.ts";
-import { logger } from "./logger.ts";
+import { AuthError } from "./auth-error.ts";
+import { logger } from "../logger.ts";
+import { ConflictError } from "./conflict-error.ts";
 
 // Every error thrown by a hook or a handler ends here. The response body is a fixed label per
 // status; the detail goes to the error log line, which never carries a token.
@@ -34,6 +35,8 @@ const labels: Record<Status, string> = {
 
 function classify(error: unknown): { status: number; label: string; reason?: string } {
   if (error instanceof AuthError) return { status: 401, label: labels[401], reason: error.reason };
+  if (error instanceof ConflictError)
+    return { status: 409, label: labels[409], reason: error.reason };
   // Fastify's own errors, such as schema validation failures, carry their status.
   const status = hasStatusCode(error) ? error.statusCode : 500;
   const label = status in labels ? labels[status as Status] : "error";

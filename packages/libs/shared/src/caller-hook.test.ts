@@ -1,8 +1,9 @@
 import { test, before, after } from "node:test";
 import assert from "node:assert/strict";
 import Fastify, { type FastifyInstance } from "fastify";
-import { AuthError, callerHook } from "./caller-hook.ts";
+import { callerHook } from "./caller-hook.ts";
 import { TokenError } from "./auth/verify-id-token.ts";
+import { AuthError } from "./errors/auth-error.ts";
 
 const tokenIdentity = { subject: "sub-1", name: "Token Name" };
 const storedDuck = { duckId: "duck-1", name: "Stored Name" };

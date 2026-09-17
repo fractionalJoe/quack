@@ -1,5 +1,6 @@
 import type { FastifyRequest } from "fastify";
-import { TokenError, verifyIdToken, type TokenFailureReason } from "./auth/verify-id-token.ts";
+import { TokenError, verifyIdToken } from "./auth/verify-id-token.ts";
+import { AuthError } from "./errors/auth-error.ts";
 
 type Identity = {
   duckId?: string;
@@ -43,12 +44,4 @@ export function callerHook({ verifyToken = verifyIdToken, resolveDuck }: CallerH
     request.identity.duckId = duck.duckId;
     request.identity.name = duck.name;
   };
-}
-
-export type AuthFailureReason = TokenFailureReason | "missing" | "no duck";
-
-export class AuthError extends Error {
-  constructor(public readonly reason: AuthFailureReason) {
-    super(`unauthorized: ${reason}`);
-  }
 }
