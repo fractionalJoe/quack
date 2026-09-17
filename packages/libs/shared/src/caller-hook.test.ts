@@ -1,7 +1,7 @@
 import { test, before, after } from "node:test";
 import assert from "node:assert/strict";
 import Fastify, { type FastifyInstance } from "fastify";
-import { AuthError, callerHook } from "./caller-hook-draft.ts";
+import { AuthError, callerHook } from "./caller-hook.ts";
 import { TokenError } from "./auth/verify-id-token.ts";
 
 const tokenIdentity = { subject: "sub-1", name: "Token Name" };
@@ -14,7 +14,7 @@ async function verifyToken(token: string) {
   throw new TokenError("malformed");
 }
 
-async function resolve(pondId: string, subject: string) {
+async function resolveDuck(pondId: string, subject: string) {
   return pondId === "pond-1" && subject === "sub-1" ? storedDuck : undefined;
 }
 
@@ -22,7 +22,7 @@ let app: FastifyInstance;
 
 before(async () => {
   app = Fastify();
-  app.addHook("onRequest", callerHook({ verifyToken, resolve }));
+  app.addHook("onRequest", callerHook({ verifyToken, resolveDuck }));
   app.setErrorHandler((error: unknown, _request, reply) => {
     if (error instanceof AuthError) return reply.code(401).send({ reason: error.reason });
     return reply.code(500).send({ error: "internal" });

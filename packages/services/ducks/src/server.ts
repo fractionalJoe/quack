@@ -1,5 +1,5 @@
 import Fastify, { type FastifyInstance } from "fastify";
-import { QuackClient, ducks, ponds } from "@quack/db";
+import { QuackClient, ducks, ponds, resolveDuck } from "@quack/db";
 import { callerHook, registerErrorHandler } from "@quack/shared";
 
 // The load balancer stamps every request with this header; log lines carry it as the request ID.
@@ -10,12 +10,12 @@ registerErrorHandler(app);
 app.get("/health", async () => ({ status: "ok" }));
 
 app.register(async (api: FastifyInstance) => {
-  api.addHook("onRequest", callerHook({ resolve }));
+  api.addHook("onRequest", callerHook({ resolveDuck }));
 
   // Sign-in (WFL-01). No pond in the path: the service assigns the one pond and returns it.
   api.put("/ducks/me", async (request) => {
     const { subject, name } = request.identity;
-    const pondId = await onlyPond(subject);
+    const pondId = await getPond(subject);
     const [duck] = await new QuackClient({ googleSubject: subject }, pondId).execute((tx) =>
       tx
         .insert(ducks)
@@ -30,11 +30,8 @@ app.register(async (api: FastifyInstance) => {
   });
 });
 
-// The ponds policy admits every row, but a client needs a pond to open its transaction.
-const anyPond = "00000000-0000-0000-0000-000000000000";
-
-async function onlyPond(subject: string): Promise<string> {
-  const [pond] = await new QuackClient(anyPond, { googleSubject: subject }).execute((tx) =>
+async function getPond(subject: string): Promise<string> {
+  const [pond] = await new QuackClient({ googleSubject: subject }).execute((tx) =>
     tx.select({ id: ponds.id }).from(ponds),
   );
   if (!pond) throw new Error("no pond");

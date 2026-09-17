@@ -9,7 +9,7 @@ type Identity = {
 
 interface CallerHookDeps {
   verifyToken?: typeof verifyIdToken;
-  resolve: (
+  resolveDuck: (
     pondId: string,
     subject: string,
   ) => Promise<{ duckId: string; name: string } | undefined>;
@@ -22,7 +22,7 @@ declare module "fastify" {
   }
 }
 
-export function callerHook({ verifyToken = verifyIdToken, resolve }: CallerHookDeps) {
+export function callerHook({ verifyToken = verifyIdToken, resolveDuck }: CallerHookDeps) {
   return async (request: FastifyRequest) => {
     const authHeader = request.headers.authorization ?? "";
     if (!authHeader.startsWith("Bearer ")) throw new AuthError("missing");
@@ -37,7 +37,7 @@ export function callerHook({ verifyToken = verifyIdToken, resolve }: CallerHookD
     const { pondId } = request.params as { pondId?: string };
     if (pondId === undefined) return;
 
-    const duck = await resolve(pondId, request.identity.subject);
+    const duck = await resolveDuck(pondId, request.identity.subject);
     if (!duck) throw new AuthError("no duck");
     request.pondId = pondId;
     request.identity.duckId = duck.duckId;

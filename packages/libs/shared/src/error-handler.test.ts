@@ -1,7 +1,7 @@
 import { test, before, after, beforeEach, afterEach, mock } from "node:test";
 import assert from "node:assert/strict";
 import Fastify, { type FastifyInstance } from "fastify";
-import { AuthError } from "./caller-hook-draft.ts";
+import { AuthError } from "./caller-hook.ts";
 import { registerErrorHandler } from "./error-handler.ts";
 import { logger } from "./logger.ts";
 
