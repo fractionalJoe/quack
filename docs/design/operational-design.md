@@ -35,7 +35,7 @@ flowchart LR
     migrate & compute --> s4
 ```
 
-The deploy role may assume the CDK bootstrap roles ([Bootstrapping](https://docs.aws.amazon.com/cdk/v2/guide/bootstrapping.html)). The migrate role holds only the Data API, master secret, and SSM parameter permissions the migration needs. Both trust one GitHub Environment and nothing else; which branches may deploy to that environment is a rule on the environment in GitHub. Both come from `packages/infra/BootstrapIam.yaml`, applied once per account outside the CDK app (README, Setup).
+The deploy role may assume the CDK bootstrap roles ([Bootstrapping](https://docs.aws.amazon.com/cdk/v2/guide/bootstrapping.html)). The migrate role holds only the Data API, master secret, and SSM parameter permissions the migration needs. Both trust one GitHub Environment and nothing else; which branches may deploy to that environment is a rule on the environment in GitHub. Both come from `packages/stacks/infra/BootstrapIam.yaml`, applied once per account outside the CDK app (README, Setup).
 
 `cdk deploy` from a developer machine is the path for initial setup and troubleshooting. Both paths run the same apps from the same configuration.
 

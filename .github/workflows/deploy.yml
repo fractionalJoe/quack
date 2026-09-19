@@ -55,17 +55,17 @@ jobs:
         with:
           filters: |
             infra:
-              - packages/infra/**
+              - packages/stacks/infra/**
               - packages/libs/cdk/**
               - packages/libs/shared/**
               - .github/**
             compute:
-              - packages/compute/**
+              - packages/stacks/compute/**
               - packages/libs/cdk/**
               - packages/libs/shared/**
               - .github/**
             data:
-              - packages/data/**
+              - packages/stacks/data/**
               - packages/libs/cdk/**
               - packages/libs/shared/**
               - .github/**

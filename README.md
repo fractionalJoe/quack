@@ -18,16 +18,16 @@ Every stack deploys with CDK from GitHub Actions through OpenID Connect, so no l
 
 **Repository layout**
 
-| Path                | Contents                                                                    |
-| ------------------- | --------------------------------------------------------------------------- |
-| `packages/infra`    | VPC and subnets, plus the bootstrap IAM template for GitHub Actions         |
-| `packages/data`     | Aurora cluster, Valkey node, bastion host                                   |
-| `packages/compute`  | ECS cluster and load balancer                                               |
-| `packages/libs`     | Shared code: CDK base stack, database schema, config and token verification |
-| `docs/design`       | Architecture, data model, request flows, operational design                 |
-| `docs/adr`          | Decision records                                                            |
-| `docs/discovery`    | Delivery plan and design playbook                                           |
-| `.github/workflows` | Deploy pipeline                                                             |
+| Path                      | Contents                                                                    |
+| ------------------------- | --------------------------------------------------------------------------- |
+| `packages/stacks/infra`   | VPC and subnets, plus the bootstrap IAM template for GitHub Actions         |
+| `packages/stacks/data`    | Aurora cluster, Valkey node, bastion host                                   |
+| `packages/stacks/compute` | ECS cluster and load balancer                                               |
+| `packages/libs`           | Shared code: CDK base stack, database schema, config and token verification |
+| `docs/design`             | Architecture, data model, request flows, operational design                 |
+| `docs/adr`                | Decision records                                                            |
+| `docs/discovery`          | Delivery plan and design playbook                                           |
+| `.github/workflows`       | Deploy pipeline                                                             |
 
 Start at [docs/README.md](docs/README.md) for the full design. Progress against the plan is tracked in [docs/discovery/PLAN.md](docs/discovery/PLAN.md).
 
@@ -42,7 +42,7 @@ Once per AWS account, before the first workflow run.
      --profile ryt.quack.admin \
      --region us-east-1 \
      --stack-name BootstrapIam \
-     --template-file packages/infra/BootstrapIam.yaml \
+     --template-file packages/stacks/infra/BootstrapIam.yaml \
      --capabilities CAPABILITY_NAMED_IAM \
      --parameter-overrides GitHubRepo=quack GitHubRepoId=1367449169 GitHubEnvironment=dev
    ```
