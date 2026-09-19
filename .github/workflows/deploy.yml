@@ -11,8 +11,8 @@ on:
         default: dev
         options:
           - dev
-      infra:
-        description: Deploy InfraStack
+      network:
+        description: Deploy NetworkStack
         type: boolean
         default: false
       compute:
@@ -40,7 +40,7 @@ jobs:
   changes:
     runs-on: ubuntu-latest
     outputs:
-      infra: ${{ steps.filter.outputs.infra }}
+      network: ${{ steps.filter.outputs.network }}
       compute: ${{ steps.filter.outputs.compute }}
       data: ${{ steps.filter.outputs.data }}
       migrate: ${{ steps.filter.outputs.migrate }}
@@ -54,18 +54,18 @@ jobs:
         id: filter
         with:
           filters: |
-            infra:
-              - packages/stacks/infra/**
+            network:
+              - packages/platform/network/**
               - packages/libs/cdk/**
               - packages/libs/shared/**
               - .github/**
             compute:
-              - packages/stacks/compute/**
+              - packages/platform/compute/**
               - packages/libs/cdk/**
               - packages/libs/shared/**
               - .github/**
             data:
-              - packages/stacks/data/**
+              - packages/platform/data/**
               - packages/libs/cdk/**
               - packages/libs/shared/**
               - .github/**
@@ -91,9 +91,9 @@ jobs:
       - name: Unit tests
         run: pnpm typecheck && pnpm test:unit
 
-  infra:
+  network:
     needs: [changes, build]
-    if: needs.changes.outputs.infra == 'true' || (github.event_name == 'workflow_dispatch' && inputs.infra)
+    if: needs.changes.outputs.network == 'true' || (github.event_name == 'workflow_dispatch' && inputs.network)
     runs-on: ubuntu-latest
     # environment sets the OIDC subject to repo:<org>/<repo>:environment:<name>,
     # the only subject BootstrapIam.yaml trusts.
@@ -107,17 +107,17 @@ jobs:
         with:
           role-to-assume: ${{ vars.AWS_DEPLOY_ROLE_ARN }}
 
-      - name: Deploy QuackInfraStack
-        run: pnpm infra cdk deploy QuackInfraStack --require-approval never
+      - name: Deploy QuackNetworkStack
+        run: pnpm network cdk deploy QuackNetworkStack --require-approval never
 
   compute:
-    needs: [changes, build, infra]
+    needs: [changes, build, network]
     # !cancelled() replaces the implied success(), which would skip this job
-    # whenever infra is skipped. Build must pass and infra must pass or be
+    # whenever network is skipped. Build must pass and network must pass or be
     # skipped; then run on a compute change or on dispatch with the compute input.
     if: >-
       !cancelled() && needs.build.result == 'success' && 
-      (needs.infra.result == 'success' || needs.infra.result == 'skipped') &&
+      (needs.network.result == 'success' || needs.network.result == 'skipped') &&
       (
         needs.changes.outputs.compute == 'true' || 
         (github.event_name == 'workflow_dispatch' && inputs.compute)
@@ -139,13 +139,13 @@ jobs:
         run: pnpm compute cdk deploy QuackComputeStack --require-approval never
 
   data:
-    needs: [changes, build, infra]
+    needs: [changes, build, network]
     # !cancelled() replaces the implied success(), which would skip this job
-    # whenever infra is skipped. Build must pass and infra must pass or be
+    # whenever network is skipped. Build must pass and network must pass or be
     # skipped; then run on a data change or on dispatch with the data input.
     if: >-
       !cancelled() && needs.build.result == 'success' && 
-      (needs.infra.result == 'success' || needs.infra.result == 'skipped') &&
+      (needs.network.result == 'success' || needs.network.result == 'skipped') &&
       (
         needs.changes.outputs.data == 'true' || 
         (github.event_name == 'workflow_dispatch' && inputs.data)

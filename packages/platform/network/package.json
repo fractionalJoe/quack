@@ -1,13 +1,13 @@
 {
-  "name": "@quack/infra",
+  "name": "@quack/network",
   "version": "0.0.0",
   "private": true,
   "type": "module",
   "scripts": {
     "cdk": "cdk",
     "typecheck": "tsc --noEmit",
-    "diff": "cdk diff QuackInfraStack --profile ryt.quack.admin",
-    "deploy": "cdk deploy QuackInfraStack --profile ryt.quack.admin"
+    "diff": "cdk diff QuackNetworkStack --profile ryt.quack.admin",
+    "deploy": "cdk deploy QuackNetworkStack --profile ryt.quack.admin"
   },
   "dependencies": {
     "@quack/shared": "workspace:*"

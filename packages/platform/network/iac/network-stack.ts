@@ -3,13 +3,13 @@ import { SubnetType, Vpc } from "aws-cdk-lib/aws-ec2";
 import type { Construct } from "constructs";
 import { QuackStack } from "@quack/cdk";
 
-export interface InfraStackProps extends StackProps {
+export interface NetworkStackProps extends StackProps {
   vpcName: string;
 }
 
-export class InfraStack extends QuackStack {
-  constructor(scope: Construct, props: InfraStackProps) {
-    super(scope, "QuackInfraStack", props);
+export class NetworkStack extends QuackStack {
+  constructor(scope: Construct, props: NetworkStackProps) {
+    super(scope, "QuackNetworkStack", props);
 
     const subnets = [
       { name: "public", subnetType: SubnetType.PUBLIC },

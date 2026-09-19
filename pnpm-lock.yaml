@@ -267,6 +267,54 @@ importers:
         specifier: ^6.2.12
         version: 6.2.12
 
+  packages/platform/compute:
+    dependencies:
+      '@quack/shared':
+        specifier: workspace:*
+        version: link:../../libs/shared
+    devDependencies:
+      '@quack/cdk':
+        specifier: workspace:*
+        version: link:../../libs/cdk
+      aws-cdk-lib:
+        specifier: ^2.269.0
+        version: 2.269.0(constructs@10.8.1)
+      constructs:
+        specifier: ^10.8.1
+        version: 10.8.1
+
+  packages/platform/data:
+    dependencies:
+      '@quack/shared':
+        specifier: workspace:*
+        version: link:../../libs/shared
+    devDependencies:
+      '@quack/cdk':
+        specifier: workspace:*
+        version: link:../../libs/cdk
+      aws-cdk-lib:
+        specifier: ^2.269.0
+        version: 2.269.0(constructs@10.8.1)
+      constructs:
+        specifier: ^10.8.1
+        version: 10.8.1
+
+  packages/platform/network:
+    dependencies:
+      '@quack/shared':
+        specifier: workspace:*
+        version: link:../../libs/shared
+    devDependencies:
+      '@quack/cdk':
+        specifier: workspace:*
+        version: link:../../libs/cdk
+      aws-cdk-lib:
+        specifier: ^2.269.0
+        version: 2.269.0(constructs@10.8.1)
+      constructs:
+        specifier: ^10.8.1
+        version: 10.8.1
+
   packages/services/ducks:
     dependencies:
       '@quack/db':
@@ -281,54 +329,6 @@ importers:
       tsx:
         specifier: ^4.23.13
         version: 4.23.13
-    devDependencies:
-      '@quack/cdk':
-        specifier: workspace:*
-        version: link:../../libs/cdk
-      aws-cdk-lib:
-        specifier: ^2.269.0
-        version: 2.269.0(constructs@10.8.1)
-      constructs:
-        specifier: ^10.8.1
-        version: 10.8.1
-
-  packages/stacks/compute:
-    dependencies:
-      '@quack/shared':
-        specifier: workspace:*
-        version: link:../../libs/shared
-    devDependencies:
-      '@quack/cdk':
-        specifier: workspace:*
-        version: link:../../libs/cdk
-      aws-cdk-lib:
-        specifier: ^2.269.0
-        version: 2.269.0(constructs@10.8.1)
-      constructs:
-        specifier: ^10.8.1
-        version: 10.8.1
-
-  packages/stacks/data:
-    dependencies:
-      '@quack/shared':
-        specifier: workspace:*
-        version: link:../../libs/shared
-    devDependencies:
-      '@quack/cdk':
-        specifier: workspace:*
-        version: link:../../libs/cdk
-      aws-cdk-lib:
-        specifier: ^2.269.0
-        version: 2.269.0(constructs@10.8.1)
-      constructs:
-        specifier: ^10.8.1
-        version: 10.8.1
-
-  packages/stacks/infra:
-    dependencies:
-      '@quack/shared':
-        specifier: workspace:*
-        version: link:../../libs/shared
     devDependencies:
       '@quack/cdk':
         specifier: workspace:*

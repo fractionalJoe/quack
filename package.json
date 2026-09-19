@@ -7,7 +7,7 @@
     "data": "pnpm --filter @quack/data",
     "db": "pnpm --filter @quack/db",
     "ducks": "pnpm --filter @quack/ducks",
-    "infra": "pnpm --filter @quack/infra",
+    "network": "pnpm --filter @quack/network",
     "shared": "pnpm --filter @quack/shared",
     "build": "pnpm -r build",
     "docker:build:ducks": "docker build -f packages/services/ducks/Dockerfile -t quack-ducks .",
