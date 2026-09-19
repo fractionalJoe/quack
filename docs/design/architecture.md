@@ -51,7 +51,7 @@ flowchart LR
 | Aurora PostgreSQL         | Serverless v2 cluster, one database, one table per entity, every table carrying pond_id. Each domain owns its tables and is their only writer; row-level security enforces pond and membership on every query (ADR-009) | data              |
 | Message fan-out           | ElastiCache Valkey node; pub/sub topics between tasks, and the ticket handoff                                                                                                                                           | data              |
 | Bastion host              | EC2 instance in a protected subnet with no inbound rules, reached through Session Manager; forwards a developer's local port to the data store                                                                          | data              |
-| Network                   | VPC, public subnets for the load balancer, protected subnets for tasks, private subnets with no route out for the data store and the fan-out node                                                                       | infra             |
+| Network                   | VPC, public subnets for the load balancer, protected subnets for tasks, private subnets with no route out for the data store and the fan-out node                                                                       | network           |
 | Certificates              | ACM in us-east-1; one for quack.ryt.dev on CloudFront, one for api.quack.ryt.dev on the load balancer; validated by CNAME in Cloudflare                                                                                 | web, compute      |
 
 ## Request paths
@@ -100,9 +100,9 @@ One repository. Each row is a CDK stack in its own project; independent stacks d
 
 | Stack                              | Contents                                                                                                   | Depends on    |
 | ---------------------------------- | ---------------------------------------------------------------------------------------------------------- | ------------- |
-| infra                              | VPC, subnets, NAT gateway for image pulls and Google key fetches; shared parameters and roles              | none          |
-| data                               | Aurora cluster and Valkey node, each with a subnet group and security group; SSM parameters; bastion host  | infra         |
-| compute                            | ECS cluster, load balancer, HTTPS listener, certificate, SSM parameters                                    | infra         |
+| network                            | VPC, subnets, NAT gateway for image pulls and Google key fetches                                           | none          |
+| data                               | Aurora cluster and Valkey node, each with a subnet group and security group; SSM parameters; bastion host  | network       |
+| compute                            | ECS cluster, load balancer, HTTPS listener, certificate, SSM parameters                                    | network       |
 | ducks, flocks, messages, websocket | Task definition, service, target group, listener rule, scaling policy, log group, database role and grants | compute, data |
 | web                                | S3 bucket, CloudFront distribution, certificate                                                            | none          |
 

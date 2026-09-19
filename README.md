@@ -18,19 +18,20 @@ Every stack deploys with CDK from GitHub Actions through OpenID Connect, so no l
 
 **Repository layout**
 
-| Path                      | Contents                                                            |
-| ------------------------- | ------------------------------------------------------------------- |
-| `packages/stacks/infra`   | VPC and subnets, plus the bootstrap IAM template for GitHub Actions |
-| `packages/stacks/data`    | Aurora cluster, Valkey node, bastion host                           |
-| `packages/stacks/compute` | ECS cluster and load balancer                                       |
-| `packages/services/ducks` | Ducks HTTP service: server, Dockerfile, and its CDK stack           |
-| `packages/libs/shared`    | Configuration, token verification, caller hook, logger, errors      |
-| `packages/libs/cdk`       | CDK stack base class                                                |
-| `packages/libs/db`        | Database schema, migrations, and data access client                 |
-| `docs/design`             | Architecture, data model, request flows, operational design         |
-| `docs/adr`                | Decision records                                                    |
-| `docs/discovery`          | Delivery plan and design playbook                                   |
-| `.github/workflows`       | Deploy pipeline                                                     |
+| Path                                  | Contents                                                       |
+| ------------------------------------- | -------------------------------------------------------------- |
+| `packages/platform/BootstrapIam.yaml` | Bootstrap IAM template for GitHub Actions                      |
+| `packages/platform/network`           | VPC and subnets                                                |
+| `packages/platform/data`              | Aurora cluster, Valkey node, bastion host                      |
+| `packages/platform/compute`           | ECS cluster and load balancer                                  |
+| `packages/services/ducks`             | Ducks HTTP service: server, Dockerfile, and its CDK stack      |
+| `packages/libs/shared`                | Configuration, token verification, caller hook, logger, errors |
+| `packages/libs/cdk`                   | CDK stack base class                                           |
+| `packages/libs/db`                    | Database schema, migrations, and data access client            |
+| `docs/design`                         | Architecture, data model, request flows, operational design    |
+| `docs/adr`                            | Decision records                                               |
+| `docs/discovery`                      | Delivery plan and design playbook                              |
+| `.github/workflows`                   | Deploy pipeline                                                |
 
 Start at [docs/README.md](docs/README.md) for the full design. Progress against the plan is tracked in [docs/discovery/PLAN.md](docs/discovery/PLAN.md).
 
@@ -45,12 +46,12 @@ Once per AWS account, before the first workflow run.
      --profile ryt.quack.admin \
      --region us-east-1 \
      --stack-name BootstrapIam \
-     --template-file packages/stacks/infra/BootstrapIam.yaml \
+     --template-file packages/platform/BootstrapIam.yaml \
      --capabilities CAPABILITY_NAMED_IAM \
      --parameter-overrides GitHubRepo=quack GitHubRepoId=1367449169 GitHubEnvironment=dev
    ```
 
-2. Bootstrap CDK in the account and region: `pnpm infra cdk bootstrap --profile ryt.quack.admin`.
+2. Bootstrap CDK in the account and region: `pnpm network cdk bootstrap --profile ryt.quack.admin`.
 
 3. In the GitHub repository, create the `dev` environment with two variables from the BootstrapIam stack outputs: `AWS_DEPLOY_ROLE_ARN` set to `DeployRoleArn` and `AWS_MIGRATE_ROLE_ARN` set to `MigrateRoleArn`. Under the environment's deployment branches rule, allow `main` only; the roles trust the environment, so this rule is what limits deploys to `main`.
 

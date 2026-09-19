@@ -5,7 +5,7 @@ Decided: 2026-09-12
 Contributors: Joe Martin, Claude
 Decision Maker: Joe Martin
 Superseded By:
-Related ADRs: adr-002-compute.md, adr-004-http-entry-point.md, adr-005-fan-out-between-tasks.md
+Related ADRs: adr-002-compute.md, adr-004-http-entry-point.md, adr-005-fan-out-between-tasks.md, adr-013-platform-package-naming.md
 ---
 
 # ADR-007: Repository and stack layout
@@ -16,7 +16,7 @@ How is the code organised and how many CDK stacks deploy it? The system has a ne
 
 ## Decision
 
-One repository. Each deployable is its own project with its own CDK stack: infra (network and shared structural resources), one stack per shared data store, cluster (ECS cluster, Application Load Balancer, listener, certificate), static web client, one stack per HTTP domain (ducks, flocks, messages), and the WebSocket service. Shared code lives in a workspace package. Stacks share values through environment variables or SSM parameters, chosen case by case; CloudFormation exports are not used. Independent stacks deploy in parallel.
+One repository. Each deployable is its own project with its own CDK stack: network, data (every shared data store), compute (ECS cluster, Application Load Balancer, listener, certificate), static web client, one stack per HTTP domain (ducks, flocks, messages), and the WebSocket service. Shared code lives in workspace packages. Stacks share values through environment variables or SSM parameters, chosen case by case; CloudFormation exports are not used. Independent stacks deploy in parallel.
 
 ## Rationale
 
@@ -46,7 +46,7 @@ As option 2 with ducks, flocks, and messages as separate ECS services, target gr
 
 ## Consequences
 
-The repo carries a workspace with a shared package and one project per stack. The GitHub Actions workflow deploys each stack as its own job, ordered by dependency; independent jobs run in parallel. Each service has its own scaling policy, log group, and task role. Configuration flows through environment variables set by CDK and SSM parameters read at start; a value's source is stated where it is consumed. The messages service must either call the flocks service or read membership records under a stated rule; that rule is recorded in the architecture doc.
+The repo carries a workspace with shared packages and one project per stack. The GitHub Actions workflow deploys each stack as its own job, ordered by dependency; independent jobs run in parallel. Each service has its own scaling policy, log group, and task role. Configuration flows through environment variables set by CDK and SSM parameters read at start; a value's source is stated where it is consumed. The messages service must either call the flocks service or read membership records under a stated rule; that rule is recorded in the architecture doc.
 
 ## Revisit When
 
