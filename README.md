@@ -18,16 +18,19 @@ Every stack deploys with CDK from GitHub Actions through OpenID Connect, so no l
 
 **Repository layout**
 
-| Path                      | Contents                                                                    |
-| ------------------------- | --------------------------------------------------------------------------- |
-| `packages/stacks/infra`   | VPC and subnets, plus the bootstrap IAM template for GitHub Actions         |
-| `packages/stacks/data`    | Aurora cluster, Valkey node, bastion host                                   |
-| `packages/stacks/compute` | ECS cluster and load balancer                                               |
-| `packages/libs`           | Shared code: CDK base stack, database schema, config and token verification |
-| `docs/design`             | Architecture, data model, request flows, operational design                 |
-| `docs/adr`                | Decision records                                                            |
-| `docs/discovery`          | Delivery plan and design playbook                                           |
-| `.github/workflows`       | Deploy pipeline                                                             |
+| Path                      | Contents                                                            |
+| ------------------------- | ------------------------------------------------------------------- |
+| `packages/stacks/infra`   | VPC and subnets, plus the bootstrap IAM template for GitHub Actions |
+| `packages/stacks/data`    | Aurora cluster, Valkey node, bastion host                           |
+| `packages/stacks/compute` | ECS cluster and load balancer                                       |
+| `packages/services/ducks` | Ducks HTTP service: server, Dockerfile, and its CDK stack           |
+| `packages/libs/shared`    | Configuration, token verification, caller hook, logger, errors      |
+| `packages/libs/cdk`       | CDK stack base class                                                |
+| `packages/libs/db`        | Database schema, migrations, and data access client                 |
+| `docs/design`             | Architecture, data model, request flows, operational design         |
+| `docs/adr`                | Decision records                                                    |
+| `docs/discovery`          | Delivery plan and design playbook                                   |
+| `.github/workflows`       | Deploy pipeline                                                     |
 
 Start at [docs/README.md](docs/README.md) for the full design. Progress against the plan is tracked in [docs/discovery/PLAN.md](docs/discovery/PLAN.md).
 
